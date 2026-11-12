@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="발전기, 양수기 등 산업용 기계 임대 전문 업체. 제품 카탈로그와 임대 문의를 확인하세요.">
+  <title>신화 산업기계 임대 | 발전기 · 양수기 렌탈</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- 상단 네비게이션 -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="#top" class="logo">신화<span>렌탈</span></a>
+      <button class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="nav" class="site-nav">
+        <a href="#about">회사소개</a>
+        <a href="#catalog">제품 카탈로그</a>
+        <a href="#contact">문의하기</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- 히어로 -->
+    <section class="hero">
+      <div class="container">
+        <p class="eyebrow">INDUSTRIAL EQUIPMENT RENTAL</p>
+        <h1>필요한 순간, 필요한 장비를<br>바로 빌려드립니다</h1>
+        <p class="hero-desc">발전기, 양수기 등 현장에 필요한 산업용 기계를<br class="hide-sm">단기·장기 임대로 합리적으로 제공합니다.</p>
+        <div class="hero-actions">
+          <a href="#catalog" class="btn btn-primary">제품 보기</a>
+          <a href="#contact" class="btn btn-ghost">임대 문의</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 회사 소개 -->
+    <section id="about" class="section">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">ABOUT US</p>
+          <h2>회사 소개</h2>
+          <p class="section-sub">현장을 아는 장비 임대 파트너</p>
+        </header>
+
+        <div class="about-grid">
+          <div class="about-text">
+            <p>
+              신화렌탈은 건설 현장, 공장, 행사, 재해 복구 현장 등 다양한 곳에서 필요한
+              산업용 기계를 임대하는 전문 업체입니다. 장비는 정기적으로 점검·정비하여
+              언제든 안전하게 사용하실 수 있도록 관리하고 있습니다.
+            </p>
+            <p>
+              고객의 작업 일정과 규모에 맞춰 단기·장기 계약을 모두 지원하며,
+              필요한 장비를 빠르게 찾을 수 있도록 상담부터 현장 배송까지 한 번에 도와드립니다.
+            </p>
+          </div>
+
+          <ul class="feature-list">
+            <li>
+              <span class="feature-num">01</span>
+              <div>
+                <h3>정기 점검 장비</h3>
+                <p>출고 전 점검과 정비를 거친 장비만 임대합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-num">02</span>
+              <div>
+                <h3>단기 · 장기 임대</h3>
+                <p>하루 단위 작업부터 몇 달간의 장기 프로젝트까지 대응합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span class="feature-num">03</span>
+              <div>
+                <h3>현장 배송 · 회수</h3>
+                <p>장비 운송과 설치, 사용 후 회수까지 함께 진행합니다.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <dl class="stats">
+          <div><dt>보유 장비</dt><dd>120<small>대+</small></dd></div>
+          <div><dt>누적 임대 현장</dt><dd>850<small>+</small></dd></div>
+          <div><dt>평균 응답</dt><dd>1<small>영업일 이내</small></dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- 제품 카탈로그 -->
+    <section id="catalog" class="section section-alt">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">PRODUCT CATALOG</p>
+          <h2>제품 카탈로그</h2>
+          <p class="section-sub">용도에 맞는 장비를 카테고리별로 확인하세요</p>
+        </header>
+
+        <div class="filters" role="tablist" aria-label="제품 카테고리">
+          <button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">전체</button>
+          <button class="filter-btn" data-filter="generator" role="tab" aria-selected="false">발전기</button>
+          <button class="filter-btn" data-filter="pump" role="tab" aria-selected="false">양수기</button>
+          <button class="filter-btn" data-filter="compressor" role="tab" aria-selected="false">공기압축기</button>
+          <button class="filter-btn" data-filter="etc" role="tab" aria-selected="false">기타 장비</button>
+        </div>
+
+        <div id="product-grid" class="product-grid" aria-live="polite"></div>
+        <p id="empty-msg" class="empty-msg" hidden>해당 카테고리의 제품이 없습니다.</p>
+      </div>
+    </section>
+
+    <!-- 문의 -->
+    <section id="contact" class="section">
+      <div class="container">
+        <header class="section-head">
+          <p class="eyebrow">CONTACT</p>
+          <h2>임대 문의</h2>
+          <p class="section-sub">장비, 기간, 현장 위치를 알려주시면 견적을 안내해 드립니다</p>
+        </header>
+
+        <div class="contact-grid">
+          <div class="contact-info">
+            <div class="info-item">
+              <h3>전화</h3>
+              <p><a href="tel:00-0000-0000">00-0000-0000</a></p>
+            </div>
+            <div class="info-item">
+              <h3>이메일</h3>
+              <p><a href="mailto:info@example.com">info@example.com</a></p>
+            </div>
+            <div class="info-item">
+              <h3>주소</h3>
+              <p>서울특별시 OO구 OO로 00 (OO산업단지)</p>
+            </div>
+            <div class="info-item">
+              <h3>운영시간</h3>
+              <p>평일 08:30 – 18:00 · 토요일 08:30 – 13:00<br>일요일 · 공휴일 휴무</p>
+            </div>
+          </div>
+
+          <form id="contact-form" class="contact-form" novalidate>
+            <div class="field">
+              <label for="name">회사명 / 성명 <span class="req">*</span></label>
+              <input id="name" name="name" type="text" required autocomplete="name">
+              <p class="error" data-error-for="name"></p>
+            </div>
+            <div class="field">
+              <label for="phone">연락처 <span class="req">*</span></label>
+              <input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="010-0000-0000">
+              <p class="error" data-error-for="phone"></p>
+            </div>
+            <div class="field">
+              <label for="equipment">필요 장비</label>
+              <select id="equipment" name="equipment">
+                <option value="">선택해 주세요</option>
+                <option>발전기</option>
+                <option>양수기</option>
+                <option>공기압축기</option>
+                <option>기타 장비</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="period">임대 기간</label>
+              <input id="period" name="period" type="text" placeholder="예: 2026.12.01 ~ 2026.12.15">
+            </div>
+            <div class="field">
+              <label for="message">문의 내용</label>
+              <textarea id="message" name="message" rows="4" placeholder="현장 위치, 필요 수량, 기타 요청사항을 적어주세요"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">문의 보내기</button>
+            <p class="form-note">입력하신 내용은 이메일 작성 창으로 전달됩니다. 보내기 전 내용을 확인해 주세요.</p>
+            <p id="form-status" class="form-status" role="status"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p class="footer-logo">신화렌탈</p>
+      <p>상호명 신화렌탈 · 대표 OOO · 사업자등록번호 000-00-00000</p>
+      <p class="copy">&copy; <span id="year"></span> 신화렌탈. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="js/products.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
