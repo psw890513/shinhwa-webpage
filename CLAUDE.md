@@ -1,7 +1,7 @@
 # 프로젝트 지침
 
 ## 프로젝트 개요
-신화 건설의 산업기계(발전기, 양수기 등) 임대 웹사이트.
+(주)신화건설기계의 산업기계(발전기, 양수기 등) 임대 웹사이트.
 - 공개 사이트: `index.html` (정적 HTML/CSS/JS)
 - 관리자: `admin/` (제품 관리, 접수 내역) — Firebase Firestore / Authentication 사용
 - 개발 브랜치: `claude/affectionate-heisenberg-faf044`
