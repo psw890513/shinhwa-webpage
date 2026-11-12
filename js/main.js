@@ -1,7 +1,16 @@
+const CONTACT_EMAIL = "info@example.com"; // Firebase 미설정 시 메일 작성용 주소
+
+// Firebase는 동적으로 불러옵니다. CDN 로드에 실패해도 샘플 데이터로 사이트가 계속 동작하도록 하기 위함입니다.
+let fb = null;
+try {
+  fb = await import("./firebase.js");
+} catch (err) {
+  console.warn("Firebase를 불러오지 못했습니다. 샘플 데이터로 표시합니다.", err);
+}
+const firebaseReady = Boolean(fb && fb.isConfigured);
+
 (function () {
   "use strict";
-
-  const CONTACT_EMAIL = "info@example.com"; // 실제 문의 이메일로 변경하세요
 
   /* ---------- 연도 표시 ---------- */
   const yearEl = document.getElementById("year");
@@ -29,6 +38,8 @@
   const grid = document.getElementById("product-grid");
   const emptyMsg = document.getElementById("empty-msg");
   const filterBtns = document.querySelectorAll(".filter-btn");
+  let allProducts = [];
+  let currentFilter = "all";
 
   function createCard(product) {
     const card = document.createElement("article");
@@ -52,11 +63,11 @@
 
     const summary = document.createElement("p");
     summary.className = "product-summary";
-    summary.textContent = product.summary;
+    summary.textContent = product.summary || "";
 
     const list = document.createElement("ul");
     list.className = "spec-list";
-    product.spec.forEach((s) => {
+    (product.spec || []).forEach((s) => {
       const li = document.createElement("li");
       li.textContent = s;
       list.appendChild(li);
@@ -73,8 +84,9 @@
   }
 
   function renderProducts(filter) {
+    currentFilter = filter;
     grid.innerHTML = "";
-    const items = PRODUCTS.filter((p) => filter === "all" || p.category === filter);
+    const items = allProducts.filter((p) => filter === "all" || p.category === filter);
     items.forEach((p) => grid.appendChild(createCard(p)));
     emptyMsg.hidden = items.length !== 0;
   }
@@ -95,10 +107,10 @@
   grid.addEventListener("click", (e) => {
     const cta = e.target.closest(".product-cta");
     if (!cta) return;
+    const product = allProducts.find((p) => p.name === cta.dataset.product);
     const select = document.getElementById("equipment");
-    const category = PRODUCTS.find((p) => p.name === cta.dataset.product)?.category;
-    if (select && category) {
-      const label = CATEGORY_LABELS[category];
+    const label = product && CATEGORY_LABELS[product.category];
+    if (select && label) {
       const option = [...select.options].find((o) => o.textContent === label);
       if (option) select.value = option.value || option.textContent;
     }
@@ -108,11 +120,24 @@
     }
   });
 
-  renderProducts("all");
+  // Firestore에서 제품을 가져오고, 없거나 실패하면 샘플 데이터를 사용
+  async function loadProducts() {
+    let data = null;
+    try {
+      data = firebaseReady ? await fb.fetchProducts() : null;
+    } catch (err) {
+      console.error("제품 목록을 불러오지 못했습니다.", err);
+    }
+    allProducts = data && data.length ? data : PRODUCTS;
+    renderProducts(currentFilter);
+  }
 
-  /* ---------- 문의 폼 (유효성 검사 후 메일 작성 창으로 전달) ---------- */
+  loadProducts();
+
+  /* ---------- 문의 폼 ---------- */
   const form = document.getElementById("contact-form");
   const statusEl = document.getElementById("form-status");
+  const submitBtn = form.querySelector('button[type="submit"]');
 
   function showError(name, msg) {
     const el = form.querySelector('[data-error-for="' + name + '"]');
@@ -140,36 +165,59 @@
     return ok;
   }
 
-  form.addEventListener("submit", (e) => {
+  function setStatus(msg, type) {
+    statusEl.textContent = msg;
+    statusEl.className = "form-status" + (type ? " is-" + type : "");
+  }
+
+  form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    statusEl.textContent = "";
-    statusEl.className = "form-status";
+    setStatus("", "");
 
     if (!validate()) {
-      statusEl.textContent = "입력 내용을 확인해 주세요.";
-      statusEl.classList.add("is-error");
+      setStatus("입력 내용을 확인해 주세요.", "error");
       return;
     }
 
     const data = new FormData(form);
-    const lines = [
-      "회사명 / 성명: " + data.get("name"),
-      "연락처: " + data.get("phone"),
-      "필요 장비: " + (data.get("equipment") || "미선택"),
-      "임대 기간: " + (data.get("period") || "미입력"),
-      "",
-      "문의 내용:",
-      data.get("message") || "(없음)"
-    ];
+    const payload = {
+      name: (data.get("name") || "").trim().slice(0, 100),
+      phone: (data.get("phone") || "").trim().slice(0, 30),
+      equipment: data.get("equipment") || "",
+      period: (data.get("period") || "").trim().slice(0, 100),
+      message: (data.get("message") || "").trim().slice(0, 2000)
+    };
 
-    const subject = "[임대 문의] " + data.get("name");
-    const mailto =
-      "mailto:" + CONTACT_EMAIL +
-      "?subject=" + encodeURIComponent(subject) +
-      "&body=" + encodeURIComponent(lines.join("\n"));
+    // Firebase 설정 전: 메일 작성 창으로 대신 전달
+    if (!firebaseReady) {
+      const lines = [
+        "회사명 / 성명: " + payload.name,
+        "연락처: " + payload.phone,
+        "필요 장비: " + (payload.equipment || "미선택"),
+        "임대 기간: " + (payload.period || "미입력"),
+        "",
+        "문의 내용:",
+        payload.message || "(없음)"
+      ];
+      const mailto =
+        "mailto:" + CONTACT_EMAIL +
+        "?subject=" + encodeURIComponent("[임대 문의] " + payload.name) +
+        "&body=" + encodeURIComponent(lines.join("\n"));
+      window.location.href = mailto;
+      setStatus("메일 작성 창이 열리지 않으면 " + CONTACT_EMAIL + " 로 직접 보내주세요.", "success");
+      return;
+    }
 
-    window.location.href = mailto;
-    statusEl.textContent = "메일 작성 창이 열리지 않으면 " + CONTACT_EMAIL + " 로 직접 보내주세요.";
-    statusEl.classList.add("is-success");
+    submitBtn.disabled = true;
+    try {
+      await fb.addInquiry(payload);
+      form.reset();
+      setStatus("문의가 접수되었습니다. 담당자가 확인 후 연락드리겠습니다.", "success");
+    } catch (err) {
+      console.error(err);
+      setStatus("전송에 실패했습니다. 잠시 후 다시 시도하거나 전화로 문의해 주세요.", "error");
+    } finally {
+      submitBtn.disabled = false;
+    }
   });
 })();
