@@ -13,7 +13,7 @@
   gap: .75rem;
   padding: .9rem 0;
 }
-.admin-header .logo { font-size: 1.15rem; }
+.admin-header .logo { font-size: 1.15rem; color: #fff; }
 .admin-nav { display: flex; gap: 1.25rem; flex-wrap: wrap; }
 .admin-nav a { color: #fff; opacity: .8; text-decoration: none; font-weight: 500; }
 .admin-nav a[aria-current="page"], .admin-nav a:hover { opacity: 1; color: var(--c-primary); }

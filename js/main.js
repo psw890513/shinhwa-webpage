@@ -41,30 +41,30 @@ const firebaseReady = Boolean(fb && fb.isConfigured);
   let allProducts = [];
   let currentFilter = "all";
 
+  // 규격표의 한 행: 구분 | 장비명(+설명) | 주요 규격 | 상태 | 문의
   function createCard(product) {
-    const card = document.createElement("article");
-    card.className = "product-card";
+    const tr = document.createElement("tr");
 
-    const top = document.createElement("div");
-    top.className = "product-top";
-
-    const cat = document.createElement("span");
-    cat.className = "tag";
+    const cat = document.createElement("td");
+    cat.className = "col-cat";
+    cat.dataset.label = "구분";
     cat.textContent = CATEGORY_LABELS[product.category] || "";
 
-    const status = document.createElement("span");
-    status.className = "status status-" + product.status;
-    status.textContent = STATUS_LABELS[product.status] || "";
+    const name = document.createElement("td");
+    name.className = "col-name";
+    const strong = document.createElement("strong");
+    strong.textContent = product.name;
+    name.appendChild(strong);
+    if (product.summary) {
+      const small = document.createElement("span");
+      small.className = "product-summary";
+      small.textContent = product.summary;
+      name.appendChild(small);
+    }
 
-    top.append(cat, status);
-
-    const title = document.createElement("h3");
-    title.textContent = product.name;
-
-    const summary = document.createElement("p");
-    summary.className = "product-summary";
-    summary.textContent = product.summary || "";
-
+    const spec = document.createElement("td");
+    spec.className = "col-spec";
+    spec.dataset.label = "규격";
     const list = document.createElement("ul");
     list.className = "spec-list";
     (product.spec || []).forEach((s) => {
@@ -72,15 +72,27 @@ const firebaseReady = Boolean(fb && fb.isConfigured);
       li.textContent = s;
       list.appendChild(li);
     });
+    spec.appendChild(list);
 
+    const status = document.createElement("td");
+    status.className = "col-status";
+    status.dataset.label = "상태";
+    const badge = document.createElement("span");
+    badge.className = "status status-" + product.status;
+    badge.textContent = STATUS_LABELS[product.status] || "";
+    status.appendChild(badge);
+
+    const action = document.createElement("td");
+    action.className = "col-action";
     const cta = document.createElement("a");
     cta.className = "product-cta";
     cta.href = "#contact";
     cta.dataset.product = product.name;
-    cta.textContent = "이 장비 문의하기 →";
+    cta.textContent = "문의";
+    action.appendChild(cta);
 
-    card.append(top, title, summary, list, cta);
-    return card;
+    tr.append(cat, name, spec, status, action);
+    return tr;
   }
 
   function renderProducts(filter) {
