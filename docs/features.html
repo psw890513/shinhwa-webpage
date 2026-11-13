@@ -74,8 +74,8 @@ footer { color: var(--muted); font-size: 13px; }
     <h1>(주)신화건설기계 사이트 기능 점검표</h1>
     <div class="meta">
       <span>마지막 점검 <b>2026-11-13</b></span>
-      <span>자동 테스트 <b>18개 통과 / 0개 실패</b> (<code>npm test</code>)</span>
-      <span>기준 코드 <b>main</b> (PR #8 반영)</span>
+      <span>자동 테스트 <b>20개 통과 / 0개 실패</b> (<code>npm test</code>)</span>
+      <span>기준 코드 <b>main</b> (PR #10 반영)</span>
     </div>
   </header>
 
@@ -140,15 +140,15 @@ const FEATURES = [
   { group: "관리자 (admin/)", items: [
     ["관리자 로그인", "admin/index.html", "off", true, "Firebase 설정(<code>js/firebase-config.js</code>)과 관리자 계정 등록 전에는 로그인할 수 없습니다. 페이지가 열리는지와 검색엔진 차단(noindex)만 자동 확인합니다."],
     ["장비 등록·수정·삭제", "제품 관리", "off", false, "이름, 구분, 규격, 사진 주소, 임대료(1일·7일·30일), 사양, 상태를 관리합니다. 비어 있을 때 '샘플 제품 불러오기'로 샘플 11개를 한 번에 넣을 수 있습니다."],
-    ["접수 내역 확인", "접수 내역", "off", false, "견적 요청 목록, 상태 변경, 삭제. Firebase 연결 후 사용 가능합니다."],
-    ["보안 규칙", "firestore.rules", "off", false, "규칙 파일은 준비되어 있지만 Firebase에 아직 배포하지 않았습니다. 배포 방법은 README에 있습니다."],
+    ["견적 요청 관리", "admin/inquiries.html", "off", true, "상태 흐름(신규 → 연락함 → 견적 발송 → 계약 → 완료, 취소), 상태별 탭과 건수, 검색, 전화·문자·번호 복사, 견적 금액, 처리 메모, 처리 기록, 삭제(두 번 눌러 확인). 접수 후 24시간 넘게 연락하지 않은 신규 요청은 '지연'으로 경고합니다. 열어 두면 5분마다 새 요청을 확인합니다. <strong>Firebase 연결 전에는 실제 요청을 받을 수 없고</strong>, 주소 끝에 <code>?demo</code>를 붙이면 예시 데이터로 둘러볼 수 있습니다(저장 안 됨). <strong>새 요청이 와도 문자·메일 알림은 없습니다.</strong> 관리자 페이지를 직접 열어 확인해야 합니다."],
+    ["보안 규칙", "firestore.rules", "off", false, "규칙 파일은 준비되어 있지만 Firebase에 아직 배포하지 않았습니다. 관리자는 견적 요청의 처리 정보만 고칠 수 있고 손님이 쓴 내용은 바꿀 수 없게 했습니다. 배포 방법은 README에 있습니다."],
   ]},
   { group: "배포와 관리", items: [
     ["무료 호스팅 (GitHub Pages)", "main 브랜치", "ok", false, "main에 합치면 1~2분 뒤 자동으로 반영됩니다. 주소: psw890513.github.io/shinhwa-webpage. 저장소가 공개 상태여야 유지됩니다."],
     ["도메인", "GitHub Pages 설정", "off", false, "아직 없습니다. 구매 후 Pages 설정의 Custom domain에 넣으면 됩니다."],
     ["글꼴 (Pretendard)", "모든 페이지", "ok", false, "실제 사이트에서는 정상입니다. Claude 미리보기 화면에서만 보안 정책 때문에 다른 글꼴로 보입니다."],
     ["검색엔진 노출", "공개 페이지", "warn", false, "관리자 페이지는 차단되어 있습니다. 공개 페이지용 사이트맵과 네이버·구글 등록은 도메인 연결 후에 하는 것이 좋습니다."],
-    ["자동 점검 테스트", "tests/smoke.test.js", "ok", true, "PC·모바일에서 18개 항목을 확인합니다. 기능을 바꿀 때마다 실행하고 결과를 이 표에 반영합니다."],
+    ["자동 점검 테스트", "tests/smoke.test.js", "ok", true, "PC·모바일과 관리자 예시 화면에서 20개 항목을 확인합니다. 기능을 바꿀 때마다 실행하고 결과를 이 표에 반영합니다."],
   ]},
 ];
 

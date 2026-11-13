@@ -12,7 +12,9 @@ import {
   deleteDoc,
   query,
   orderBy,
-  serverTimestamp
+  serverTimestamp,
+  arrayUnion,
+  Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import {
   getAuth,
@@ -77,13 +79,22 @@ export async function fetchInquiries() {
     return {
       id: d.id,
       ...data,
-      createdAt: data.createdAt ? data.createdAt.toDate() : null
+      createdAt: data.createdAt ? data.createdAt.toDate() : null,
+      updatedAt: data.updatedAt ? data.updatedAt.toDate() : null,
+      history: (data.history || []).map((h) => ({ ...h, at: h.at && h.at.toDate ? h.at.toDate() : null }))
     };
   });
 }
 
 export function setInquiryStatus(id, status) {
   return updateDoc(doc(db, "inquiries", id), { status });
+}
+
+// 상태, 견적 금액, 처리 메모를 저장하고 처리 기록(history)에 한 줄을 더합니다.
+export function updateInquiry(id, fields, historyNote) {
+  const data = { ...fields, updatedAt: serverTimestamp() };
+  if (historyNote) data.history = arrayUnion({ ...historyNote, at: Timestamp.now() });
+  return updateDoc(doc(db, "inquiries", id), data);
 }
 
 export function deleteInquiry(id) {

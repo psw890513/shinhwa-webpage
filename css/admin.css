@@ -1,4 +1,5 @@
 /* 관리자 페이지 전용 스타일 (style.css의 디자인 토큰을 그대로 사용) */
+[hidden] { display: none !important; } /* style.css의 .card { display:flex } 가 hidden 을 덮지 않도록 */
 .admin-body { background: var(--c-bg-alt); min-height: 100vh; }
 
 .admin-header {
@@ -75,3 +76,66 @@ td.msg { max-width: 320px; white-space: pre-wrap; word-break: break-all; }
 
 .toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .75rem; margin-bottom: 1rem; }
 .toolbar select { font: inherit; padding: .5rem .7rem; border-radius: 8px; border: 1px solid var(--c-line); background: var(--c-bg); color: var(--c-text); }
+
+/* ---------- 견적 요청 관리 ---------- */
+.inq-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 1rem; }
+.admin-main .inq-head h1 { margin: 0; }
+.demo-banner { margin-bottom: 1rem; }
+.inq-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 1rem; }
+.inq-tab { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; font: inherit; font-size: 14px; font-weight: 600;
+  color: var(--c-text); background: var(--c-bg); border: 1px solid var(--c-line); border-radius: 999px; cursor: pointer; }
+.inq-tab[aria-selected="true"] { background: var(--c-dark); color: #fff; border-color: var(--c-dark); }
+.inq-tab-n { min-width: 22px; padding: 0 6px; border-radius: 999px; background: var(--c-bg-alt); color: var(--c-text); font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
+.inq-tab.has-new .inq-tab-n { background: var(--c-primary); color: #fff; }
+
+.inq-layout { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 20px; align-items: start; }
+.inq-search { width: 100%; font: inherit; padding: .6rem .8rem; margin-bottom: 10px; border: 1px solid var(--c-line); border-radius: 8px; background: var(--c-bg); color: var(--c-text); }
+.inq-list { display: grid; gap: 8px; }
+.inq-item { width: 100%; display: grid; gap: 4px; padding: 14px 16px; text-align: left; font: inherit; color: var(--c-text);
+  background: var(--c-bg); border: 1px solid var(--c-line); border-radius: 10px; cursor: pointer; }
+.inq-item:hover { border-color: var(--c-muted); }
+.inq-item.is-selected { border-color: var(--c-dark); box-shadow: inset 0 0 0 1px var(--c-dark); }
+.inq-item-top { display: flex; align-items: center; gap: 6px; }
+.inq-time { margin-left: auto; font-size: 12px; color: var(--c-muted); }
+.inq-name { font-size: 16px; }
+.inq-sub { font-size: 13px; color: var(--c-muted); }
+.inq-empty { padding: 2rem 1rem; text-align: center; color: var(--c-muted); background: var(--c-bg); border-radius: 10px; }
+
+.st { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; background: var(--c-bg-alt); color: var(--c-text); }
+.st-new { background: var(--c-primary); color: #fff; }
+.st-contacted, .st-in_progress { background: #e7eefc; color: #1e4fb8; }
+.st-quoted { background: #f1e8fb; color: #6b2fb3; }
+.st-contracted { background: #e5f5ec; color: #17683b; }
+.st-done { background: var(--c-ok); color: #fff; }
+.st-canceled { background: var(--c-bg-alt); color: var(--c-muted); text-decoration: line-through; }
+.st-late { background: #fee2e2; color: #991b1b; }
+
+.inq-detail { margin: 0; display: grid; gap: 18px; }
+.inq-d-head { display: flex; align-items: center; gap: 8px; }
+.inq-back { display: none; }
+.admin-main .inq-d-name { margin: 0; font-size: 22px; }
+.inq-contact { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.inq-contact .btn-small { text-decoration: none; }
+.inq-fields div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-top: 1px solid var(--c-line); }
+.inq-fields dt { color: var(--c-muted); font-size: 14px; }
+.inq-fields dd { margin: 0; font-weight: 500; }
+.inq-msg { white-space: pre-wrap; word-break: break-word; font-weight: 400; }
+.inq-form { display: grid; gap: 14px; padding-top: 16px; border-top: 2px solid var(--c-dark); }
+.inq-status-pick { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; border: 0; }
+.inq-status-pick legend { width: 100%; margin-bottom: 8px; font-weight: 600; font-size: .9rem; }
+.inq-status-pick label { cursor: pointer; }
+.inq-status-pick input { position: absolute; opacity: 0; pointer-events: none; }
+.inq-status-pick span { display: inline-block; padding: 7px 14px; border: 1px solid var(--c-line); border-radius: 999px; font-size: 14px; font-weight: 600; }
+.inq-status-pick input:checked + span { background: var(--c-dark); color: #fff; border-color: var(--c-dark); }
+.inq-status-pick input:focus-visible + span { outline: 2px solid var(--c-primary); outline-offset: 2px; }
+.inq-history h3 { margin: 0 0 8px; font-size: 15px; }
+.inq-history ul { display: grid; gap: 6px; }
+.inq-history li { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 14px; }
+.inq-history time { color: var(--c-muted); font-variant-numeric: tabular-nums; }
+
+@media (max-width: 860px) {
+  .inq-layout { grid-template-columns: 1fr; }
+  .inq-layout.has-detail .inq-list-wrap { display: none; }
+  .inq-layout:not(.has-detail) .inq-detail { display: none; }
+  .inq-back { display: inline-block; }
+}
