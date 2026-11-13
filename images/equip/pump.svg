@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" role="img" aria-label="엔진양수기">
+  <ellipse cx="120" cy="157" rx="96" ry="7" fill="#000" opacity=".08"/>
+  <path d="M40 150V58a10 10 0 0 1 10-10h140a10 10 0 0 1 10 10v92" fill="none" stroke="#2B2F36" stroke-width="7" stroke-linejoin="round"/>
+  <path d="M30 150h180" stroke="#2B2F36" stroke-width="8" stroke-linecap="round"/>
+  <rect x="58" y="62" width="70" height="50" rx="6" fill="#E35F14"/>
+  <rect x="58" y="62" width="70" height="14" rx="6" fill="#F28440"/><rect x="58" y="70" width="70" height="6" fill="#F28440"/>
+  <rect x="70" y="50" width="38" height="14" rx="3" fill="#E35F14"/><rect x="82" y="44" width="14" height="8" rx="2" fill="#2B2F36"/>
+  <rect x="62" y="112" width="70" height="30" rx="4" fill="#4A4F57"/>
+  <g fill="#2B2F36"><rect x="68" y="118" width="4" height="18"/><rect x="77" y="118" width="4" height="18"/><rect x="86" y="118" width="4" height="18"/><rect x="95" y="118" width="4" height="18"/></g>
+  <circle cx="160" cy="112" r="28" fill="#8A9099"/><circle cx="160" cy="112" r="18" fill="#6B7178"/><circle cx="160" cy="112" r="7" fill="#4A4F57"/>
+  <rect x="186" y="104" width="30" height="16" rx="2" fill="#6B7178"/><rect x="212" y="100" width="8" height="24" rx="2" fill="#4A4F57"/>
+  <rect x="150" y="68" width="20" height="18" rx="2" fill="#6B7178"/><rect x="146" y="62" width="28" height="8" rx="2" fill="#4A4F57"/>
+  <circle cx="140" cy="84" r="5" fill="#2B2F36"/>
+</svg>

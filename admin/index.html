@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>제품 관리 | (주)신화건설기계 관리자</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body class="admin-body">
+
+  <header class="admin-header">
+    <div class="container">
+      <a href="../index.html" class="logo">신화건설기계 <small>관리자</small></a>
+      <nav class="admin-nav">
+        <a href="index.html" aria-current="page">제품 관리</a>
+        <a href="inquiries.html">접수 내역</a>
+        <a href="../index.html" target="_blank" rel="noopener">사이트 보기</a>
+        <button id="logout-btn" class="btn-small btn-header" type="button" hidden>로그아웃</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="admin-main">
+    <div class="container">
+
+      <!-- 로그인 화면 -->
+      <section id="login-view" class="card login-card" hidden>
+        <h1>관리자 로그인</h1>
+        <div id="config-warning" class="notice notice-warn" hidden>
+          Firebase 설정이 아직 없습니다. js/firebase-config.js 를 먼저 채워 주세요.
+        </div>
+        <form id="login-form" novalidate>
+          <div class="field">
+            <label for="email">이메일</label>
+            <input id="email" name="email" type="email" required autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="password">비밀번호</label>
+            <input id="password" name="password" type="password" required autocomplete="current-password">
+          </div>
+          <p id="login-error" class="error" role="alert"></p>
+          <button type="submit" class="btn btn-primary btn-block">로그인</button>
+        </form>
+      </section>
+
+      <!-- 권한 없음 -->
+      <section id="denied-view" class="card login-card" hidden>
+        <h1>접근 권한이 없습니다</h1>
+        <p>이 계정은 관리자로 등록되어 있지 않습니다. 관리자에게 문의해 주세요.</p>
+        <button id="denied-logout-btn" class="btn btn-primary btn-block" type="button">다른 계정으로 로그인</button>
+      </section>
+
+      <!-- 관리자 앱 -->
+      <div id="app-view" hidden>
+        <h1>제품 관리</h1>
+
+        <section class="card">
+          <h2 id="form-title">새 제품 등록</h2>
+          <form id="product-form" novalidate>
+            <input type="hidden" name="id">
+            <div class="form-grid">
+              <div class="field">
+                <label for="p-name">제품명 *</label>
+                <input id="p-name" name="name" type="text" required>
+              </div>
+              <div class="field">
+                <label for="p-category">카테고리 *</label>
+                <select id="p-category" name="category" required>
+                  <option value="generator">발전기</option>
+                  <option value="pump">엔진양수기</option>
+                  <option value="motor">수중모터</option>
+                  <option value="etc">기타 장비</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="p-rating">규격 (숫자와 단위)</label>
+                <input id="p-rating" name="rating" type="text" placeholder="예: 10 kVA, 4 인치, 3 HP">
+              </div>
+              <div class="field">
+                <label for="p-art">사진이 없을 때 그림</label>
+                <select id="p-art" name="art">
+                  <option value="">구분에 맞춰 자동</option>
+                  <option value="generator">발전기</option>
+                  <option value="pump">엔진양수기</option>
+                  <option value="motor">수중모터</option>
+                  <option value="compressor">공기압축기</option>
+                  <option value="welder">용접기</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="p-image">사진 주소 (선택)</label>
+                <input id="p-image" name="image" type="text" placeholder="예: https://.../photo.jpg 또는 images/내사진.jpg">
+              </div>
+              <div class="field">
+                <label for="p-day">임대료 1일 (원)</label>
+                <input id="p-day" name="priceDay" type="number" min="0" step="1000" placeholder="비우면 '견적 문의'">
+              </div>
+              <div class="field">
+                <label for="p-week">임대료 7일 (원)</label>
+                <input id="p-week" name="priceWeek" type="number" min="0" step="1000">
+              </div>
+              <div class="field">
+                <label for="p-month">임대료 30일 (원)</label>
+                <input id="p-month" name="priceMonth" type="number" min="0" step="1000">
+              </div>
+              <div class="field full">
+                <label for="p-summary">한 줄 설명</label>
+                <input id="p-summary" name="summary" type="text">
+              </div>
+              <div class="field full">
+                <label for="p-spec">주요 사양 (한 줄에 하나씩)</label>
+                <textarea id="p-spec" name="spec" rows="4" placeholder="정격출력 50kVA&#10;연료: 경유"></textarea>
+              </div>
+              <div class="field">
+                <label for="p-status">임대 상태</label>
+                <select id="p-status" name="status">
+                  <option value="available">출고 가능</option>
+                  <option value="reserved">예약 중</option>
+                </select>
+              </div>
+            </div>
+            <p id="product-error" class="error" role="alert"></p>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary btn-inline">저장</button>
+              <button type="button" id="cancel-edit" class="btn-small" hidden>수정 취소</button>
+            </div>
+          </form>
+        </section>
+
+        <div id="admin-notice" class="notice" hidden></div>
+
+        <section class="card">
+          <div class="toolbar">
+            <h2 style="margin:0">등록된 제품 <span id="product-count" class="hint"></span></h2>
+            <button id="seed-btn" class="btn-small" type="button" hidden>샘플 제품 불러오기</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>제품명</th><th>규격</th><th>카테고리</th><th>상태</th><th>사양</th><th></th></tr>
+              </thead>
+              <tbody id="product-rows"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <script type="module" src="common.js"></script>
+  <script src="../js/products.js"></script>
+  <script type="module" src="products.js"></script>
+</body>
+</html>

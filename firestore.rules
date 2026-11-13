@@ -1,0 +1,45 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 관리자 여부: admins/{uid} 문서가 존재하는 로그인 사용자
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // 제품: 누구나 읽기, 관리자만 쓰기
+    match /products/{productId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // 접수 문의: 누구나 새 문의 등록만 가능 (형식 검증 포함), 조회·수정·삭제는 관리자만
+    match /inquiries/{inquiryId} {
+      allow create: if request.resource.data.keys().hasOnly(
+                      ['name', 'phone', 'equipment', 'period', 'message', 'status', 'createdAt'])
+                    && request.resource.data.name is string
+                    && request.resource.data.name.size() > 0
+                    && request.resource.data.name.size() <= 100
+                    && request.resource.data.phone is string
+                    && request.resource.data.phone.size() > 0
+                    && request.resource.data.phone.size() <= 30
+                    && request.resource.data.equipment is string
+                    && request.resource.data.equipment.size() <= 50
+                    && request.resource.data.period is string
+                    && request.resource.data.period.size() <= 100
+                    && request.resource.data.message is string
+                    && request.resource.data.message.size() <= 2000
+                    && request.resource.data.status == 'new'
+                    && request.resource.data.createdAt == request.time;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // 관리자 목록: 본인 문서만 읽기 가능, 콘솔에서만 수정
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+  }
+}
