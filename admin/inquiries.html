@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>접수 내역 | (주)신화건설기계 관리자</title>
+  <title>견적 요청 관리 | (주)신화건설기계 관리자</title>
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/admin.css">
 </head>
@@ -15,7 +15,7 @@
       <a href="../index.html" class="logo">신화건설기계 <small>관리자</small></a>
       <nav class="admin-nav">
         <a href="index.html">제품 관리</a>
-        <a href="inquiries.html" aria-current="page">접수 내역</a>
+        <a href="inquiries.html" aria-current="page">견적 요청 관리</a>
         <a href="../index.html" target="_blank" rel="noopener">사이트 보기</a>
         <button id="logout-btn" class="btn-small btn-header" type="button" hidden>로그아웃</button>
       </nav>
@@ -29,7 +29,7 @@
       <section id="login-view" class="card login-card" hidden>
         <h1>관리자 로그인</h1>
         <div id="config-warning" class="notice notice-warn" hidden>
-          Firebase 설정이 아직 없습니다. js/firebase-config.js 를 먼저 채워 주세요.
+          Firebase 설정이 아직 없습니다. js/firebase-config.js 를 먼저 채워 주세요.<br>설정 전에는 <a href="inquiries.html?demo">견적 요청 관리 예시 화면</a>을 둘러볼 수 있습니다.
         </div>
         <form id="login-form" novalidate>
           <div class="field">
@@ -54,43 +54,27 @@
 
       <!-- 관리자 앱 -->
       <div id="app-view" hidden>
-        <h1>접수 내역</h1>
+        <div class="inq-head">
+          <h1>견적 요청 관리</h1>
+          <button id="refresh-btn" class="btn-small" type="button">새로고침</button>
+        </div>
 
-        <section class="card">
-          <div class="toolbar">
-            <div>
-              <span id="summary" class="hint"></span>
-            </div>
-            <div style="display:flex; gap:.5rem; align-items:center;">
-              <label for="status-filter" class="hint">상태</label>
-              <select id="status-filter">
-                <option value="all">전체</option>
-                <option value="new">신규</option>
-                <option value="in_progress">진행 중</option>
-                <option value="done">완료</option>
-              </select>
-              <button id="refresh-btn" class="btn-small" type="button">새로고침</button>
-            </div>
-          </div>
-          <div id="admin-notice" class="notice" hidden></div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>접수일시</th>
-                  <th>회사명 / 성명</th>
-                  <th>연락처</th>
-                  <th>필요 장비</th>
-                  <th>임대 기간</th>
-                  <th>문의 내용</th>
-                  <th>상태</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="inquiry-rows"></tbody>
-            </table>
-          </div>
-        </section>
+        <div id="overdue" class="notice notice-error" hidden></div>
+        <div id="admin-notice" class="notice" hidden></div>
+
+        <div class="inq-tabs" role="tablist" aria-label="처리 상태" id="status-tabs"></div>
+
+        <div class="inq-layout">
+          <section class="inq-list-wrap" aria-label="견적 요청 목록">
+            <label for="inq-search" class="sr-only">검색</label>
+            <input id="inq-search" class="inq-search" type="search" placeholder="이름, 연락처, 장비, 내용 검색">
+            <ul id="inq-list" class="inq-list"></ul>
+          </section>
+
+          <section id="inq-detail" class="inq-detail card" aria-live="polite">
+            <p class="hint">왼쪽 목록에서 견적 요청을 고르세요.</p>
+          </section>
+        </div>
       </div>
 
     </div>

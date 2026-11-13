@@ -52,7 +52,9 @@ npm test
 
 ## 3. 보안 규칙 적용
 
-Firestore → **규칙** 탭에 `firestore.rules` 내용을 붙여넣고 **게시**합니다.
+Firestore → **규칙** 탭에 `firestore.rules` 내용을 붙여넣고 **게시**합니다. `firestore.rules`가 바뀌면 이 작업을 다시 해야 합니다.
+
+- 견적 요청: 방문자는 새 요청 등록만 할 수 있습니다. 관리자는 읽기·삭제와 처리 정보(상태, 견적 금액, 처리 메모, 처리 기록) 수정만 할 수 있고, 손님이 쓴 내용은 바꿀 수 없습니다.
 
 ## 4. 관리자 계정 만들기
 
@@ -88,4 +90,4 @@ Firestore → **규칙** 탭에 `firestore.rules` 내용을 붙여넣고 **게�
 | 공지사항 | `/notice.html` |
 | 오시는 길 | `/location.html` |
 | 제품 관리 | `/admin/` |
-| 접수 내역 | `/admin/inquiries.html` |
+| 견적 요청 관리 | `/admin/inquiries.html` (설정 전 예시 화면: `?demo`) |

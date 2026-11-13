@@ -33,7 +33,12 @@ service cloud.firestore {
                     && request.resource.data.message.size() <= 2000
                     && request.resource.data.status == 'new'
                     && request.resource.data.createdAt == request.time;
-      allow read, update, delete: if isAdmin();
+      allow read, delete: if isAdmin();
+      // 관리자 처리: 상태, 견적 금액, 처리 메모, 처리 기록만 바꿀 수 있음 (손님이 쓴 내용은 그대로)
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['status', 'quoteAmount', 'adminMemo', 'history', 'updatedAt'])
+                    && request.resource.data.status in ['new', 'contacted', 'quoted', 'contracted', 'done', 'canceled', 'in_progress'];
     }
 
     // 관리자 목록: 본인 문서만 읽기 가능, 콘솔에서만 수정

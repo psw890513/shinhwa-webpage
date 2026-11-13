@@ -124,6 +124,37 @@ async function check(name, fn) {
     assert.equal(await page.getAttribute('meta[name="robots"]', "content"), "noindex, nofollow");
     await page.close();
   });
+  await check("견적 요청 관리(예시 화면): 목록·상세·상태 변경", async () => {
+    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+    page.on("pageerror", (e) => errors.push("관리자: " + e.message));
+    await page.goto(base + "/admin/inquiries.html?demo");
+    await page.waitForSelector(".inq-item");
+    assert.equal(await page.isVisible("#login-view"), false, "예시 화면에서는 로그인 창 숨김");
+    assert.equal(await page.locator(".inq-item").count(), 4, "처리할 요청 4건");
+    assert.ok(await page.isVisible("#overdue"), "지연 경고 표시");
+    await page.locator(".inq-item").first().click();
+    assert.ok(await page.isVisible(".inq-contact a[href^='tel:']"), "전화 버튼");
+    await page.click(".inq-status-pick span:text-is('연락함')");
+    await page.fill("#f-memo", "통화 완료");
+    await page.click(".inq-form button[type=submit]");
+    await page.waitForSelector(".inq-history li >> text=상태: 연락함");
+    assert.equal(await page.textContent(".inq-tab[data-tab=new] .inq-tab-n"), "1");
+    await page.fill("#inq-search", "양수기");
+    assert.equal(await page.locator(".inq-item").count(), 1);
+    await page.close();
+  });
+  await check("견적 요청 관리(예시 화면): 모바일", async () => {
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await page.goto(base + "/admin/inquiries.html?demo");
+    await page.waitForSelector(".inq-item");
+    await page.locator(".inq-item").first().click();
+    assert.ok(await page.isVisible(".inq-back"));
+    assert.equal(await page.isVisible("#inq-list"), false, "상세를 열면 목록은 숨김");
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+    await page.click(".inq-back");
+    assert.ok(await page.isVisible("#inq-list"));
+    await page.close();
+  });
   await check("스크립트 오류 없음", async () => {
     assert.deepEqual(errors, []);
   });
