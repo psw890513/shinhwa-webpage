@@ -18,6 +18,19 @@ js/firebase.js           Firebase 연결 및 데이터 함수
 js/main.js               공개 사이트 동작 (카탈로그, 문의 폼)
 js/products.js           샘플 제품 데이터 (Firebase 미설정 시 사용)
 firestore.rules          Firestore 보안 규칙
+images/equip/            장비 그림 (SVG)
+tests/smoke.test.js      PC/모바일 동작 점검 테스트
+docs/dev-check.md        프로젝트 점검표 (네 칸)
+docs/plan.md             다음 작업 계획
+.claude/skills/          Claude 작업 스킬
+```
+
+## 점검 테스트
+
+```
+npm install
+npx playwright install chromium
+npm test
 ```
 
 ---
@@ -58,7 +71,10 @@ Firestore → **규칙** 탭에 `firestore.rules` 내용을 붙여넣고 **게�
 - 공개 사이트 호스팅은 GitHub Pages, Netlify, Firebase Hosting 중 편한 곳을 선택하면 됩니다. Firebase Hosting을 쓰면 `firebase deploy` 한 번으로 사이트와 규칙을 함께 배포할 수 있습니다.
 - 관리자 페이지는 검색엔진에 노출되지 않도록 `noindex` 설정되어 있습니다.
 
-## 페이지 주소 (배포 후 예시)
+## 페이지 주소
+
+현재 GitHub Pages(`main` 브랜치)로 배포 중: https://psw890513.github.io/shinhwa-webpage/
+
 
 | 페이지 | 경로 |
 |---|---|

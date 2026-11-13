@@ -4,7 +4,9 @@
 (주)신화건설기계의 산업기계(발전기, 양수기 등) 임대 웹사이트.
 - 공개 사이트: `index.html` (정적 HTML/CSS/JS)
 - 관리자: `admin/` (제품 관리, 접수 내역) — Firebase Firestore / Authentication 사용
-- 개발 브랜치: `claude/affectionate-heisenberg-faf044`
+- 개발 브랜치: `claude/affectionate-heisenberg-faf044` (PR로 `main`에 합침)
+- 배포: GitHub Pages `main` → https://psw890513.github.io/shinhwa-webpage/
+- 테스트: `npm test` (`tests/smoke.test.js`, Playwright)
 
 ## 답변 규칙
 - 사용자의 질문에 답변한 뒤에는 **확인할 수 있는 링크를 항상 함께 알려준다.**
@@ -20,6 +22,16 @@
 - Firebase 설정값(`js/firebase-config.js`)은 placeholder 상태일 수 있다. 설정 전에도 공개 사이트가 샘플 데이터로 동작해야 한다.
 - 보안 규칙은 `firestore.rules`에서 관리한다. 규칙을 바꾸면 README의 배포 안내도 함께 갱신한다.
 - 관리자 페이지는 `noindex` 설정을 유지한다.
+
+## 작업 순서 (스킬 기반)
+1. 새 기능이나 큰 변경: `brainstorming`으로 요구를 정리하고 `dev-check`로 네 칸을 점검한다. 작업을 막는 모르는 항목만 사용자에게 묻는다.
+2. 여러 단계 작업: `writing-plans`로 `docs/plan.md`를 갱신한다.
+3. 구현: 가능하면 `tests/smoke.test.js`에 확인 항목을 먼저 추가한다(`test-driven-development`).
+4. 버그: `systematic-debugging`으로 원인부터 찾는다.
+5. 완료 전: `npm test`를 실행하고 결과를 보고한다(`verification-before-completion`). 테스트 없이 "됐다"고 하지 않는다.
+6. 마무리: 작업 브랜치에 커밋하고 PR로 `main`에 합친다. `main`이 GitHub Pages로 배포된다.
+- 점검표는 `docs/dev-check.md`, 다음 작업은 `docs/plan.md`에 둔다. 확인된 항목은 점검표에서 위 칸으로 옮긴다.
+- 짧은 질문이나 작은 수정에는 위 절차를 생략해 사용량을 아낀다.
 
 ## 디자인 기준
 - 참고 사이트: https://sycmc.com/rental-products (장비 임대몰 구성). 구성과 배치는 참고하되 그 회사의 사진, 로고, 문구는 쓰지 않는다.
