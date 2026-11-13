@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="(주)신화건설기계 장비 임대 견적 요청. 장비, 기간, 현장 위치를 남겨 주세요.">
+  <title>견적문의 | (주)신화건설기계</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="(주)신화건설기계 처음으로">
+        <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><path d="M18 2l14 8v16l-14 8L4 26V10z" fill="#E35F14"/><path d="M23.5 12.5h-7.6a3.4 3.4 0 0 0 0 6.8h4.2a3.4 3.4 0 0 1 0 6.8h-7.6" fill="none" stroke="#fff" stroke-width="2.8"/></svg>
+        <span class="logo-text"><strong>신화건설기계</strong><small>SHINHWA MACHINERY</small></span>
+      </a>
+      <nav id="nav" class="site-nav" aria-label="주 메뉴">
+        <a href="about.html">회사소개</a>
+        <a href="index.html">임대/렌탈</a>
+        <a href="contact.html" class="is-current" aria-current="page">견적문의</a>
+        <a href="notice.html">공지사항</a>
+        <a href="location.html">오시는 길</a>
+      </nav>
+      <form class="search" role="search" id="search-form">
+        <label for="search-input" class="sr-only">장비 검색</label>
+        <input id="search-input" type="search" placeholder="장비 이름이나 규격 검색" autocomplete="off">
+        <button type="submit" aria-label="검색">
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M20 20l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </form>
+      <a class="header-phone" href="tel:00-0000-0000">00-0000-0000</a>
+      <button class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <section class="page-head">
+      <div class="container">
+        <p class="crumb"><a href="index.html">홈</a> <span aria-hidden="true">/</span> 견적문의</p>
+        <h1>견적문의</h1>
+      </div>
+    </section>
+
+    <!-- 견적 요청 -->
+    <section class="section">
+      <div class="container contact">
+        <div class="contact-intro">
+          <p>장비, 기간, 현장 위치를 남겨 주시면 영업일 기준 하루 안에 견적을 보내 드립니다.</p>
+          <dl class="contact-info">
+            <div><dt>고객센터</dt><dd><a href="tel:00-0000-0000">00-0000-0000</a></dd></div>
+            <div><dt>팩스</dt><dd>00-0000-0000</dd></div>
+            <div><dt>이메일</dt><dd><a href="mailto:info@example.com">info@example.com</a></dd></div>
+            <div><dt>운영 시간</dt><dd>평일 08:30–18:00<br>토요일 08:30–13:00</dd></div>
+          </dl>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate>
+          <div class="form-row">
+            <div class="field">
+              <label for="name">회사명 또는 성함 <span class="req">*</span></label>
+              <input id="name" name="name" type="text" required autocomplete="name" placeholder="예: OO건설 김OO">
+              <p class="error" data-error-for="name"></p>
+            </div>
+            <div class="field">
+              <label for="phone">연락처 <span class="req">*</span></label>
+              <input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="010-0000-0000">
+              <p class="error" data-error-for="phone"></p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="equipment">필요한 장비</label>
+              <select id="equipment" name="equipment">
+                <option value="">선택</option>
+                <option>발전기</option>
+                <option>엔진양수기</option>
+                <option>수중모터</option>
+                <option>기타 장비</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="period">임대 기간</label>
+              <input id="period" name="period" type="text" placeholder="예: 12월 1일부터 15일까지">
+            </div>
+          </div>
+          <div class="field">
+            <label for="message">현장 위치와 요청 사항</label>
+            <textarea id="message" name="message" rows="5" placeholder="현장 주소, 필요 수량, 설치 조건을 적어 주세요"></textarea>
+          </div>
+          <div class="form-foot">
+            <button type="submit" class="btn btn-accent">견적 요청 보내기</button>
+            <p id="form-status" class="form-status" role="status"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <ul class="footer-links">
+        <li><a href="about.html">회사소개</a></li>
+        <li><a href="index.html">장비 임대</a></li>
+        <li><a href="contact.html">견적 요청</a></li>
+        <li><a href="notice.html">공지사항</a></li>
+        <li><a href="location.html">오시는 길</a></li>
+      </ul>
+      <div class="footer-info">
+        <p>(주)신화건설기계 | 대표이사 : OOO | 사업자등록번호 : 000-00-00000</p>
+        <p>주소 : OO도 OO시 OO읍 OO길 00 | 고객센터 : 00-0000-0000 | 팩스 : 00-0000-0000</p>
+        <p class="copy">&copy; <span id="year"></span> (주)신화건설기계. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 모바일 하단 고정 바 -->
+  <nav class="bottom-bar" aria-label="빠른 연락">
+    <a href="tel:00-0000-0000">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg>
+      전화 상담
+    </a>
+    <a href="contact.html" class="is-accent">
+      <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm3 5h8M8 12h8M8 15h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      견적 요청
+    </a>
+  </nav>
+
+  <script src="js/products.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

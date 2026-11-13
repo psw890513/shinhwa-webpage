@@ -9,7 +9,11 @@
 빌드 도구 없이 동작하는 정적 사이트이며, 데이터는 Firebase(Firestore, Authentication)에 저장됩니다.
 
 ```
-index.html               공개 사이트
+index.html               임대/렌탈 (장비 목록, 메인)
+about.html               회사소개
+contact.html             견적문의 (문의 폼)
+notice.html              공지사항
+location.html            오시는 길
 admin/                   관리자 페이지
 css/style.css            공개 사이트 스타일
 css/admin.css            관리자 스타일
@@ -78,6 +82,10 @@ Firestore → **규칙** 탭에 `firestore.rules` 내용을 붙여넣고 **게�
 
 | 페이지 | 경로 |
 |---|---|
-| 공개 사이트 | `/` |
+| 임대/렌탈 (메인) | `/` |
+| 회사소개 | `/about.html` |
+| 견적문의 | `/contact.html` |
+| 공지사항 | `/notice.html` |
+| 오시는 길 | `/location.html` |
 | 제품 관리 | `/admin/` |
 | 접수 내역 | `/admin/inquiries.html` |

@@ -64,14 +64,40 @@ async function check(name, fn) {
         assert.ok(await page.isVisible("#search-note"));
         await page.click("#search-clear");
       });
+      await check("메뉴가 각각 다른 페이지로 이동", async () => {
+        const pages = { "회사소개": "about.html", "견적문의": "contact.html", "공지사항": "notice.html", "오시는 길": "location.html", "임대/렌탈": "index.html" };
+        for (const [text, file] of Object.entries(pages)) {
+          await page.click('#nav a:text-is("' + text + '")');
+          await page.waitForLoadState("load");
+          assert.ok(page.url().endsWith(file), text + " → " + page.url());
+          assert.equal(await page.getAttribute("#nav a.is-current", "href"), file);
+          assert.equal(await page.evaluate(() => scrollY), 0, text + " 페이지가 스크롤된 채로 열림");
+        }
+        await page.waitForSelector(".card");
+      });
       await check("견적 요청 버튼이 장비를 미리 선택", async () => {
         await page.locator(".card-cta").first().click();
+        await page.waitForSelector("html[data-ready]");
         assert.notEqual(await page.inputValue("#equipment"), "");
+        assert.match(await page.inputValue("#message"), /임대 견적/);
       });
       await check("견적 폼 필수값 검사", async () => {
+        await page.waitForSelector("html[data-ready]");
         await page.fill("#name", "");
         await page.click("#contact-form button[type=submit]");
         assert.notEqual((await page.textContent('[data-error-for="name"]')).trim(), "");
+      });
+      await check("다른 페이지에서 검색하면 장비 목록으로 이동", async () => {
+        await page.waitForSelector("html[data-ready]");
+        await page.fill("#search-input", "발전기");
+        await page.press("#search-input", "Enter");
+        await page.waitForSelector(".card");
+        assert.ok(await page.isVisible("#search-note"));
+      });
+      await check("공지사항 페이지 전체 목록", async () => {
+        await page.goto(base + "/notice.html");
+        await page.waitForSelector("html[data-ready]");
+        assert.equal(await page.locator("#notice-list li").count(), 5);
       });
     } else {
       await check("모바일 카테고리 드롭다운", async () => {
@@ -80,6 +106,13 @@ async function check(name, fn) {
       });
       await check("모바일 하단 고정 바", async () => {
         assert.ok(await page.isVisible(".bottom-bar"));
+      });
+      await check("모바일 메뉴로 페이지 이동", async () => {
+        await page.click(".nav-toggle");
+        await page.click('#nav a:text-is("회사소개")');
+        await page.waitForLoadState("load");
+        assert.ok(page.url().endsWith("about.html"));
+        assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
       });
     }
     await page.close();
