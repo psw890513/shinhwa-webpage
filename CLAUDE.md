@@ -28,4 +28,5 @@
 - 장비 카드 그림은 `images/equip/*.svg`(직접 그린 그림). 실제 사진은 장비 데이터의 `image`에 넣는다.
 - 임대료(`prices`)는 실제 값만 넣는다. 없으면 "견적 문의"로 표시된다. 가격을 지어내지 않는다.
 - Figma 파일(https://www.figma.com/design/F3MQev0FqHbad95LgVTX6B)은 이전 디자인(v1, v2) 기록용이다. 현재 디자인의 기준은 코드다.
+- 사용량 관리: `.claude/skills/using-superpowers`(superpowers)는 매 답변 전에 스킬을 확인하게 해서 사용량을 늘린다. 사용자가 사용량이 많다고 하거나, 짧은 요청에도 스킬 확인이 반복되면 이 스킬을 빼자고 사용자에게 먼저 제안한다(사용자 승인 후 삭제).
 - 디자인 작업에는 `.claude/skills/`의 frontend-design, ui-ux-pro-max 스킬을 쓴다. 단 사용자가 참고 사이트를 지정하면 그 구성을 우선한다.
