@@ -1,0 +1,194 @@
+<title>신화건설기계 기능 점검표</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* 레이아웃: 위에 요약 숫자 한 줄 → 필터 → 영역별 기능 표. 상태는 색 점 + 글자로 함께 표시 */
+:root {
+  --bg: #ffffff; --surface: #f6f7f9; --line: #e3e6ea; --fg: #191f28; --muted: #5f6b7a;
+  --accent: #e35f14;
+  --ok: #1f8a4c; --ok-bg: #e8f5ee; --warn: #a15c00; --warn-bg: #fdf1df; --off: #b42318; --off-bg: #fdecea;
+  --font: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12161d; --surface: #1a1f28; --line: #2c3340; --fg: #e8ebef; --muted: #9aa5b4; --accent: #f07a35;
+  --ok: #5fcf8e; --ok-bg: #173325; --warn: #f0b45a; --warn-bg: #3a2b14; --off: #f2877c; --off-bg: #3d1b19; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12161d; --surface: #1a1f28; --line: #2c3340; --fg: #e8ebef; --muted: #9aa5b4; --accent: #f07a35;
+  --ok: #5fcf8e; --ok-bg: #173325; --warn: #f0b45a; --warn-bg: #3a2b14; --off: #f2877c; --off-bg: #3d1b19; color-scheme: dark }
+
+body { background: var(--bg); color: var(--fg); font: 15px/1.6 var(--font); word-break: keep-all;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 1080px; margin: 0 auto; padding-block: 36px 64px; display: grid; gap: 28px; }
+h1 { margin: 0; font-size: 26px; letter-spacing: -.02em; text-wrap: balance; }
+h2 { margin: 0; font-size: 18px; text-wrap: balance; }
+p { margin: 0; }
+a { color: inherit; }
+.meta { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px; color: var(--muted); font-size: 14px; }
+.meta b { color: var(--fg); font-weight: 600; }
+
+.summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.summary div { padding: 16px 18px; border-left: 1px solid var(--line); }
+.summary div:first-child { border-left: 0; }
+.summary dt { font-size: 13px; color: var(--muted); }
+.summary dd { margin: 4px 0 0; font: 600 28px/1.1 var(--mono); font-variant-numeric: tabular-nums; }
+.summary .ok dd { color: var(--ok); } .summary .warn dd { color: var(--warn); } .summary .off dd { color: var(--off); }
+
+.todo { padding: 18px 20px; border-radius: 12px; background: var(--off-bg); }
+.todo h2 { color: var(--off); font-size: 16px; }
+.todo ol { margin: 10px 0 0; padding-left: 20px; display: grid; gap: 4px; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.filters button { font: 500 14px var(--font); color: var(--fg); background: var(--bg); border: 1px solid var(--line);
+  border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.filters button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+section { display: grid; gap: 10px; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; min-width: 760px; }
+th, td { text-align: left; vertical-align: top; padding: 12px 14px; border-top: 1px solid var(--line); }
+thead th { border-top: 0; background: var(--surface); font-size: 13px; font-weight: 600; color: var(--muted); }
+td:first-child { width: 26%; } td:nth-child(2) { width: 13%; } td:nth-child(3) { width: 9%; }
+.name { font-weight: 600; }
+.where { display: block; margin-top: 2px; font: 12px var(--mono); color: var(--muted); }
+.st { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; white-space: nowrap; }
+.st::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.st.ok { color: var(--ok); background: var(--ok-bg); } .st.warn { color: var(--warn); background: var(--warn-bg); } .st.off { color: var(--off); background: var(--off-bg); }
+.test { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.test.yes { color: var(--fg); }
+.note { color: var(--muted); font-size: 14px; }
+.note strong { color: var(--fg); font-weight: 600; }
+footer { color: var(--muted); font-size: 13px; }
+
+@media (max-width: 640px) {
+  .summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary div:nth-child(3) { border-left: 0; }
+  .summary div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  h1 { font-size: 22px; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>(주)신화건설기계 사이트 기능 점검표</h1>
+    <div class="meta">
+      <span>마지막 점검 <b>2026-11-13</b></span>
+      <span>자동 테스트 <b>18개 통과 / 0개 실패</b> (<code>npm test</code>)</span>
+      <span>기준 코드 <b>main</b> (PR #8 반영)</span>
+    </div>
+  </header>
+
+  <dl class="summary" id="summary"></dl>
+
+  <div class="todo">
+    <h2>실제 운영 전에 꼭 해야 할 것</h2>
+    <ol>
+      <li><strong>견적 요청이 아무 곳에도 도착하지 않습니다.</strong> Firebase가 연결되지 않아 손님 메일 앱만 열리고, 받는 주소도 임시 주소(info@example.com)입니다.</li>
+      <li>전화번호, 주소, 대표자, 사업자번호가 모두 임시 값(00-0000-0000, OO)입니다. 전화 버튼을 눌러도 연결되지 않습니다.</li>
+      <li>장비 목록과 공지사항은 샘플입니다. 실제 보유 장비와 공지로 바꿔야 합니다.</li>
+      <li>관리자 페이지는 Firebase 연결 전까지 로그인할 수 없습니다.</li>
+    </ol>
+  </div>
+
+  <div class="filters" role="group" aria-label="상태로 거르기">
+    <button type="button" data-f="all" aria-pressed="true">전체</button>
+    <button type="button" data-f="ok" aria-pressed="false">작동</button>
+    <button type="button" data-f="warn" aria-pressed="false">일부 작동</button>
+    <button type="button" data-f="off" aria-pressed="false">설정 필요</button>
+  </div>
+
+  <div id="groups"></div>
+
+  <footer>상태 기준 · 작동: 지금 그대로 쓸 수 있음 · 일부 작동: 동작은 하지만 임시 값이나 제한이 있음 · 설정 필요: Firebase 등 설정 전에는 쓸 수 없음. 테스트 열의 "자동"은 <code>tests/smoke.test.js</code>가 매번 확인하는 항목입니다.</footer>
+</div>
+
+<script>
+const FEATURES = [
+  { group: "공통 (모든 페이지)", items: [
+    ["메뉴 페이지 이동", "헤더", "ok", true, "메뉴마다 별도 페이지로 이동하고 맨 위에서 열립니다. <strong>헤더와 하단은 5개 페이지에 같은 코드가 복사되어 있어</strong>, 메뉴나 회사 정보를 바꾸면 5개 파일을 모두 고쳐야 합니다."],
+    ["모바일 메뉴 (☰)", "헤더, 900px 이하", "ok", true, "버튼을 누르면 메뉴가 펼쳐지고, 메뉴를 고르면 닫힙니다."],
+    ["장비 검색", "헤더 검색창", "ok", true, "다른 페이지에서 검색하면 임대/렌탈 페이지로 이동해 결과를 보여 줍니다. 띄어쓰기는 무시하고, 쉼표로 나누면 모든 단어를 포함한 장비만 찾습니다. 모바일에서는 돋보기를 한 번 눌러야 입력창이 열립니다."],
+    ["전화 연결", "헤더, 상담 띠, 모바일 하단 바, 오시는 길", "warn", false, "<strong>번호가 임시 값(00-0000-0000)</strong>이라 눌러도 연결되지 않습니다. 실제 번호로 바꿀 때 5개 페이지와 여러 위치를 모두 바꿔야 합니다."],
+    ["모바일 하단 고정 바", "600px 이하", "ok", true, "전화 상담과 견적 요청 버튼이 화면 아래에 고정됩니다. 전화 상담은 임시 번호입니다."],
+    ["반응형 화면", "전체", "ok", true, "PC 4열, 1100px 이하 3열, 820px 이하 2열 카드. 모바일 폭에서 가로 스크롤이 없는지 자동으로 확인합니다."],
+    ["하단 회사 정보", "모든 페이지 하단", "warn", false, "대표자, 사업자등록번호, 주소, 팩스가 <strong>모두 임시 값</strong>입니다."],
+  ]},
+  { group: "임대/렌탈 (index.html)", items: [
+    ["장비 배너 슬라이드", "상단 배너", "ok", false, "5초마다 넘어가고, 마우스를 올리면 멈춥니다. 기기에서 동작 줄이기를 켜면 자동으로 넘어가지 않습니다. <strong>배너 내용은 코드에 고정</strong>이라 관리자 페이지에서 바꿀 수 없습니다."],
+    ["카테고리 거르기", "알약 버튼 / 모바일 드롭다운", "ok", true, "기타 장비에는 공기압축기와 용접기가 함께 들어갑니다."],
+    ["정렬", "목록 오른쪽 위", "warn", false, "기본순, 출고 가능 먼저, 규격 큰순·작은순, 이름순. <strong>규격 정렬은 숫자만 비교</strong>해서 전체보기에서는 kVA, 인치, HP가 섞여 정렬됩니다. 카테고리를 고른 뒤 쓰는 게 정확합니다."],
+    ["장비 카드", "목록", "warn", true, "지금은 <strong>샘플 장비 11개</strong>입니다. Firebase를 연결하면 관리자에서 등록한 장비가 나오고, 등록된 장비가 하나도 없으면 샘플이 다시 나옵니다. 임대료를 넣지 않으면 '견적 문의'로 표시됩니다. 사진이 없으면 직접 그린 그림이 나옵니다."],
+    ["카드의 견적 요청 버튼", "카드 오른쪽 아래", "ok", true, "견적문의 페이지로 이동하면서 필요한 장비와 요청 문구를 미리 채웁니다."],
+    ["상담 띠", "목록 아래", "warn", false, "맞춤 장비 상담받기는 견적문의 페이지로 이동합니다. 전화 상담 버튼은 임시 번호입니다."],
+  ]},
+  { group: "회사소개 (about.html)", items: [
+    ["회사 소개 문구와 강점 3가지", "본문", "ok", false, "문구는 코드에 직접 들어 있습니다. 실제 회사 내용(설립 연도, 보유 대수 등)을 받으면 보강하면 됩니다."],
+    ["취급 장비 바로가기", "본문 아래", "ok", false, "누르면 해당 카테고리만 거른 장비 목록으로 이동합니다."],
+  ]},
+  { group: "견적문의 (contact.html)", items: [
+    ["견적 요청 폼 입력 확인", "폼", "ok", true, "이름과 연락처가 비었거나 형식이 틀리면 칸 아래에 안내가 나옵니다."],
+    ["견적 요청 보내기", "폼 전송", "off", false, "<strong>Firebase 미연결 상태라 실제로 접수되지 않습니다.</strong> 지금은 손님 기기의 메일 앱을 열 뿐이고 받는 주소도 임시 주소(info@example.com)입니다. 메일 앱이 없는 휴대폰에서는 아무 일도 일어나지 않을 수 있습니다. 스팸 방지 장치도 아직 없습니다."],
+    ["연락처·운영 시간 안내", "폼 왼쪽", "warn", false, "전화, 팩스, 이메일이 임시 값입니다. 운영 시간(평일 08:30–18:00, 토 08:30–13:00)도 실제 시간인지 확인이 필요합니다."],
+  ]},
+  { group: "공지사항 (notice.html)", items: [
+    ["공지 목록", "본문", "warn", true, "전체 목록이 날짜와 함께 나옵니다. <strong>샘플 공지 5개</strong>이고, 공지는 관리자 페이지가 아니라 <code>js/products.js</code>의 NOTICES를 고쳐야 바뀝니다. 공지를 눌러도 상세 내용은 없습니다."],
+  ]},
+  { group: "오시는 길 (location.html)", items: [
+    ["주소와 지도 링크", "본문", "warn", false, "주소가 임시 값이라 네이버 지도·카카오맵 버튼은 지도 첫 화면만 엽니다. <code>company-address</code>에 실제 주소를 넣으면 그 주소로 검색된 지도가 열립니다."],
+  ]},
+  { group: "관리자 (admin/)", items: [
+    ["관리자 로그인", "admin/index.html", "off", true, "Firebase 설정(<code>js/firebase-config.js</code>)과 관리자 계정 등록 전에는 로그인할 수 없습니다. 페이지가 열리는지와 검색엔진 차단(noindex)만 자동 확인합니다."],
+    ["장비 등록·수정·삭제", "제품 관리", "off", false, "이름, 구분, 규격, 사진 주소, 임대료(1일·7일·30일), 사양, 상태를 관리합니다. 비어 있을 때 '샘플 제품 불러오기'로 샘플 11개를 한 번에 넣을 수 있습니다."],
+    ["접수 내역 확인", "접수 내역", "off", false, "견적 요청 목록, 상태 변경, 삭제. Firebase 연결 후 사용 가능합니다."],
+    ["보안 규칙", "firestore.rules", "off", false, "규칙 파일은 준비되어 있지만 Firebase에 아직 배포하지 않았습니다. 배포 방법은 README에 있습니다."],
+  ]},
+  { group: "배포와 관리", items: [
+    ["무료 호스팅 (GitHub Pages)", "main 브랜치", "ok", false, "main에 합치면 1~2분 뒤 자동으로 반영됩니다. 주소: psw890513.github.io/shinhwa-webpage. 저장소가 공개 상태여야 유지됩니다."],
+    ["도메인", "GitHub Pages 설정", "off", false, "아직 없습니다. 구매 후 Pages 설정의 Custom domain에 넣으면 됩니다."],
+    ["글꼴 (Pretendard)", "모든 페이지", "ok", false, "실제 사이트에서는 정상입니다. Claude 미리보기 화면에서만 보안 정책 때문에 다른 글꼴로 보입니다."],
+    ["검색엔진 노출", "공개 페이지", "warn", false, "관리자 페이지는 차단되어 있습니다. 공개 페이지용 사이트맵과 네이버·구글 등록은 도메인 연결 후에 하는 것이 좋습니다."],
+    ["자동 점검 테스트", "tests/smoke.test.js", "ok", true, "PC·모바일에서 18개 항목을 확인합니다. 기능을 바꿀 때마다 실행하고 결과를 이 표에 반영합니다."],
+  ]},
+];
+
+const LABEL = { ok: "작동", warn: "일부 작동", off: "설정 필요" };
+const groupsEl = document.getElementById("groups");
+
+function counts() {
+  const c = { all: 0, ok: 0, warn: 0, off: 0 };
+  FEATURES.forEach(g => g.items.forEach(i => { c.all++; c[i[2]]++; }));
+  return c;
+}
+function renderSummary() {
+  const c = counts();
+  document.getElementById("summary").innerHTML =
+    `<div><dt>전체 기능</dt><dd>${c.all}</dd></div>` +
+    `<div class="ok"><dt>작동</dt><dd>${c.ok}</dd></div>` +
+    `<div class="warn"><dt>일부 작동</dt><dd>${c.warn}</dd></div>` +
+    `<div class="off"><dt>설정 필요</dt><dd>${c.off}</dd></div>`;
+}
+function render(filter) {
+  groupsEl.innerHTML = "";
+  FEATURES.forEach(g => {
+    const rows = g.items.filter(i => filter === "all" || i[2] === filter);
+    if (!rows.length) return;
+    const sec = document.createElement("section");
+    sec.style.marginBottom = "24px";
+    sec.innerHTML = `<h2>${g.group}</h2><div class="table-wrap"><table>
+      <thead><tr><th>기능</th><th>상태</th><th>테스트</th><th>설명과 주의할 점</th></tr></thead>
+      <tbody>${rows.map(([name, where, st, test, note]) => `<tr>
+        <td><span class="name">${name}</span><span class="where">${where}</span></td>
+        <td><span class="st ${st}">${LABEL[st]}</span></td>
+        <td><span class="test ${test ? "yes" : ""}">${test ? "자동" : "수동 확인"}</span></td>
+        <td class="note">${note}</td></tr>`).join("")}</tbody></table></div>`;
+    groupsEl.appendChild(sec);
+  });
+}
+document.querySelectorAll(".filters button").forEach(b => b.addEventListener("click", () => {
+  document.querySelectorAll(".filters button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  render(b.dataset.f);
+}));
+renderSummary();
+render("all");
+</script>
