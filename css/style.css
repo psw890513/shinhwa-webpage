@@ -361,6 +361,44 @@ button { font: inherit; }
   .section-head { grid-template-columns: 1fr; gap: 10px; }
 }
 
+/* ---------- 장비 사진 ---------- */
+.photo-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0 0 36px;
+}
+.photo-row figure { margin: 0; }
+.photo-link {
+  display: block;
+  width: 100%;
+  padding: 0;
+  background: var(--plate);
+  border: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+}
+.photo-link img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  transition: transform .2s;
+}
+.photo-link:hover img { transform: scale(1.03); }
+.photo-row figcaption { margin-top: 8px; font-weight: 500; }
+.photo-row figcaption span { margin-left: 6px; font-size: 13px; font-weight: 400; color: var(--steel); }
+@media (max-width: 520px) {
+  .photo-row { gap: 8px; margin-bottom: 28px; }
+  .photo-row figcaption { font-size: 13px; }
+  .photo-row figcaption span { display: block; margin-left: 0; font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .photo-link img { transition: none; }
+}
+
 /* ---------- 임대장비 표 ---------- */
 .filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
 .filter-btn {
@@ -509,6 +547,9 @@ button { font: inherit; }
 .footer-name { font-size: 19px; font-weight: 600; color: var(--board-text); }
 .footer-info { display: flex; flex-wrap: wrap; gap: 4px 28px; margin-top: 14px; }
 .copy { margin-top: 14px; }
+.credits { margin-top: 10px; font-size: 12px; line-height: 1.7; }
+.credits a { color: var(--board-muted); }
+.credits a:hover { color: var(--board-text); }
 
 /* ---------- 전화 상담 팝업 ---------- */
 .call-popup {

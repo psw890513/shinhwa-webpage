@@ -189,6 +189,14 @@ function selectFilter(filter) {
 }
 filterBtns.forEach((btn) => btn.addEventListener("click", () => selectFilter(btn.dataset.filter)));
 
+// 장비 사진을 누르면 그 구분만 표에 보여 줌
+document.querySelectorAll("[data-goto-filter]").forEach((el) => {
+  el.addEventListener("click", () => {
+    selectFilter(el.dataset.gotoFilter);
+    document.querySelector(".filters").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+});
+
 function renderCounts() {
   filterBtns.forEach((b) => {
     b.querySelector(".count").textContent = allProducts.filter((p) => inFilter(p, b.dataset.filter)).length;
