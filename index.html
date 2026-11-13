@@ -12,16 +12,16 @@
 
   <header class="site-header">
     <div class="container header-inner">
-      <a href="#top" class="logo" aria-label="(주)신화건설기계 처음으로">
+      <a href="index.html" class="logo" aria-label="(주)신화건설기계 처음으로">
         <svg width="36" height="36" viewBox="0 0 36 36" aria-hidden="true"><path d="M18 2l14 8v16l-14 8L4 26V10z" fill="#E35F14"/><path d="M23.5 12.5h-7.6a3.4 3.4 0 0 0 0 6.8h4.2a3.4 3.4 0 0 1 0 6.8h-7.6" fill="none" stroke="#fff" stroke-width="2.8"/></svg>
         <span class="logo-text"><strong>신화건설기계</strong><small>SHINHWA MACHINERY</small></span>
       </a>
       <nav id="nav" class="site-nav" aria-label="주 메뉴">
-        <a href="#about">회사소개</a>
-        <a href="#catalog" class="is-current" aria-current="page">임대/렌탈</a>
-        <a href="#contact">견적문의</a>
-        <a href="#notice">공지사항</a>
-        <a href="#location">오시는 길</a>
+        <a href="about.html">회사소개</a>
+        <a href="index.html" class="is-current" aria-current="page">임대/렌탈</a>
+        <a href="contact.html">견적문의</a>
+        <a href="notice.html">공지사항</a>
+        <a href="location.html">오시는 길</a>
       </nav>
       <form class="search" role="search" id="search-form">
         <label for="search-input" class="sr-only">장비 검색</label>
@@ -121,88 +121,8 @@
         <h2>원하시는 장비를 찾지 못하셨나요?</h2>
         <p>현장 조건을 알려 주시면 맞는 장비와 규격을 골라 드립니다.</p>
         <div class="cta-actions">
-          <a href="#contact" class="btn btn-accent">맞춤 장비 상담받기</a>
+          <a href="contact.html" class="btn btn-accent">맞춤 장비 상담받기</a>
           <a href="tel:00-0000-0000" class="btn btn-outline">전화 상담 00-0000-0000</a>
-        </div>
-      </div>
-    </section>
-
-    <!-- 견적 요청 -->
-    <section id="contact" class="section">
-      <div class="container contact">
-        <div class="contact-intro">
-          <h2>견적 요청</h2>
-          <p>장비, 기간, 현장 위치를 남겨 주시면 영업일 기준 하루 안에 견적을 보내 드립니다.</p>
-          <dl class="contact-info">
-            <div><dt>고객센터</dt><dd><a href="tel:00-0000-0000">00-0000-0000</a></dd></div>
-            <div><dt>팩스</dt><dd>00-0000-0000</dd></div>
-            <div><dt>이메일</dt><dd><a href="mailto:info@example.com">info@example.com</a></dd></div>
-            <div><dt>운영 시간</dt><dd>평일 08:30–18:00<br>토요일 08:30–13:00</dd></div>
-          </dl>
-        </div>
-
-        <form id="contact-form" class="contact-form" novalidate>
-          <div class="form-row">
-            <div class="field">
-              <label for="name">회사명 또는 성함 <span class="req">*</span></label>
-              <input id="name" name="name" type="text" required autocomplete="name" placeholder="예: OO건설 김OO">
-              <p class="error" data-error-for="name"></p>
-            </div>
-            <div class="field">
-              <label for="phone">연락처 <span class="req">*</span></label>
-              <input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="010-0000-0000">
-              <p class="error" data-error-for="phone"></p>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="field">
-              <label for="equipment">필요한 장비</label>
-              <select id="equipment" name="equipment">
-                <option value="">선택</option>
-                <option>발전기</option>
-                <option>엔진양수기</option>
-                <option>수중모터</option>
-                <option>기타 장비</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="period">임대 기간</label>
-              <input id="period" name="period" type="text" placeholder="예: 12월 1일부터 15일까지">
-            </div>
-          </div>
-          <div class="field">
-            <label for="message">현장 위치와 요청 사항</label>
-            <textarea id="message" name="message" rows="5" placeholder="현장 주소, 필요 수량, 설치 조건을 적어 주세요"></textarea>
-          </div>
-          <div class="form-foot">
-            <button type="submit" class="btn btn-accent">견적 요청 보내기</button>
-            <p id="form-status" class="form-status" role="status"></p>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- 회사소개 / 공지 / 오시는 길 -->
-    <section class="section section-gray">
-      <div class="container info-grid">
-        <div id="about" class="info-card">
-          <h2>회사소개</h2>
-          <p>(주)신화건설기계는 현장에서 쓰는 발전기, 엔진양수기, 수중모터를 임대합니다. 모든 장비는 출고 전에 점검하고 운반과 설치, 회수까지 맡으며, 사용 중 고장이 나면 같은 규격의 장비를 바로 보냅니다.</p>
-        </div>
-        <div id="notice" class="info-card">
-          <div class="info-head">
-            <h2>공지사항</h2>
-            <button type="button" id="notice-more" class="text-btn" hidden>전체 보기</button>
-          </div>
-          <ul id="notice-list" class="notice-list"></ul>
-        </div>
-        <div id="location" class="info-card">
-          <h2>오시는 길</h2>
-          <p><span id="company-address">OO도 OO시 OO읍 OO길 00</span><br>장비 야적장과 사무실이 함께 있습니다.</p>
-          <div class="map-links">
-            <a class="btn btn-outline btn-sm" id="naver-map" href="https://map.naver.com/" target="_blank" rel="noopener">네이버 지도</a>
-            <a class="btn btn-outline btn-sm" id="kakao-map" href="https://map.kakao.com/" target="_blank" rel="noopener">카카오맵</a>
-          </div>
         </div>
       </div>
     </section>
@@ -212,10 +132,11 @@
   <footer class="site-footer">
     <div class="container">
       <ul class="footer-links">
-        <li><a href="#about">회사소개</a></li>
-        <li><a href="#catalog">장비 임대</a></li>
-        <li><a href="#contact">견적 요청</a></li>
-        <li><a href="#location">오시는 길</a></li>
+        <li><a href="about.html">회사소개</a></li>
+        <li><a href="index.html">장비 임대</a></li>
+        <li><a href="contact.html">견적 요청</a></li>
+        <li><a href="notice.html">공지사항</a></li>
+        <li><a href="location.html">오시는 길</a></li>
       </ul>
       <div class="footer-info">
         <p>(주)신화건설기계 | 대표이사 : OOO | 사업자등록번호 : 000-00-00000</p>
@@ -231,7 +152,7 @@
       <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z" fill="currentColor"/></svg>
       전화 상담
     </a>
-    <a href="#contact" class="is-accent">
+    <a href="contact.html" class="is-accent">
       <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm3 5h8M8 12h8M8 15h5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       견적 요청
     </a>

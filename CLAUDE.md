@@ -2,7 +2,7 @@
 
 ## 프로젝트 개요
 (주)신화건설기계의 산업기계(발전기, 양수기 등) 임대 웹사이트.
-- 공개 사이트: `index.html` (정적 HTML/CSS/JS)
+- 공개 사이트: `index.html`, `about.html`, `contact.html`, `notice.html`, `location.html` (정적 HTML/CSS/JS)
 - 관리자: `admin/` (제품 관리, 접수 내역) — Firebase Firestore / Authentication 사용
 - 개발 브랜치: `claude/affectionate-heisenberg-faf044` (PR로 `main`에 합침)
 - 배포: GitHub Pages `main` → https://psw890513.github.io/shinhwa-webpage/
@@ -36,7 +36,7 @@
 
 ## 디자인 기준
 - 참고 사이트: https://sycmc.com/rental-products (장비 임대몰 구성). 구성과 배치는 참고하되 그 회사의 사진, 로고, 문구는 쓰지 않는다.
-- 구성 순서: 헤더(로고, 메뉴, 검색) → 장비 배너 → 카테고리 알약 버튼(모바일은 드롭다운) → 장비 카드 목록 → 상담 띠 → 견적 요청 → 회사소개/공지/오시는 길 → 남색 하단. 모바일은 하단 고정 바(전화 상담, 견적 요청).
+- 페이지 구성: 메뉴마다 별도 페이지다. `index.html`(임대/렌탈: 배너 → 카테고리 → 장비 카드 → 상담 띠), `about.html`(회사소개), `contact.html`(견적문의), `notice.html`(공지사항), `location.html`(오시는 길). 헤더·하단은 페이지마다 같은 마크업을 쓴다(바꾸면 5개 모두 수정). 모바일은 하단 고정 바(전화 상담, 견적 요청).
 - 색과 글꼴은 `css/style.css`의 `:root` 변수를 쓴다. 주황(`--accent`)은 현재 메뉴, 1일 임대료, 핵심 버튼에만 쓴다. 글꼴은 Pretendard.
 - 장비 카드 그림은 `images/equip/*.svg`(직접 그린 그림). 실제 사진은 장비 데이터의 `image`에 넣는다.
 - 임대료(`prices`)는 실제 값만 넣는다. 없으면 "견적 문의"로 표시된다. 가격을 지어내지 않는다.

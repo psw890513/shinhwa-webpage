@@ -9,6 +9,7 @@ try {
 }
 const firebaseReady = Boolean(fb && fb.isConfigured);
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const params = new URLSearchParams(location.search);
 
 function el(tag, className, textContent) {
   const node = document.createElement(tag);
@@ -34,6 +35,8 @@ nav.addEventListener("click", (e) => { if (e.target.tagName === "A") setNav(fals
 
 /* ---------- 배너 슬라이드 ---------- */
 (function initBanner() {
+  const banner = document.querySelector(".banner");
+  if (!banner) return;
   const slides = [...document.querySelectorAll(".slide")];
   const dots = [...document.querySelectorAll(".dot")];
   let current = 0, timer = null;
@@ -45,7 +48,6 @@ nav.addEventListener("click", (e) => { if (e.target.tagName === "A") setNav(fals
   function start() { if (reduceMotion) return; stop(); timer = setInterval(() => go(current + 1), 5000); }
   function stop() { if (timer) clearInterval(timer); timer = null; }
   dots.forEach((d, n) => d.addEventListener("click", () => { go(n); start(); }));
-  const banner = document.querySelector(".banner");
   banner.addEventListener("mouseenter", stop);
   banner.addEventListener("mouseleave", start);
   start();
@@ -54,24 +56,26 @@ nav.addEventListener("click", (e) => { if (e.target.tagName === "A") setNav(fals
 /* ---------- 공지사항 ---------- */
 (function initNotices() {
   const list = document.getElementById("notice-list");
+  if (!list) return;
   const more = document.getElementById("notice-more");
   const items = typeof NOTICES !== "undefined" ? NOTICES : [];
   const LIMIT = 3;
-  let expanded = false;
+  let expanded = list.dataset.show === "all";
   function render() {
     list.innerHTML = "";
     (expanded ? items : items.slice(0, LIMIT)).forEach((n) => {
       const li = el("li");
-      const date = el("time", "", n.date.slice(5).replace("-", "."));
+      const date = el("time", "", expanded ? n.date.replace(/-/g, ".") : n.date.slice(5).replace("-", "."));
       date.dateTime = n.date;
       li.append(date, el("span", "notice-title", n.title));
       list.appendChild(li);
     });
     if (!items.length) list.appendChild(el("li", "", "등록된 공지사항이 없습니다."));
+    if (!more) return;
     more.hidden = items.length <= LIMIT;
     more.textContent = expanded ? "접기" : "전체 보기";
   }
-  more.addEventListener("click", () => { expanded = !expanded; render(); });
+  if (more) more.addEventListener("click", () => { expanded = !expanded; render(); });
   render();
 })();
 
@@ -150,7 +154,7 @@ function createCard(p) {
   const foot = el("div", "card-foot");
   foot.appendChild(el("span", "card-code", "장비코드 " + String(p.id || "").toUpperCase()));
   const cta = el("a", "card-cta", "견적 요청");
-  cta.href = "#contact"; cta.dataset.product = p.name;
+  cta.href = "contact.html?product=" + encodeURIComponent(p.name) + "&category=" + encodeURIComponent(p.category || "");
   foot.appendChild(cta);
   body.appendChild(foot);
 
@@ -182,9 +186,12 @@ function selectFilter(filter) {
   categorySelect.value = filter;
   render();
 }
-pills.forEach((b) => b.addEventListener("click", () => selectFilter(b.dataset.filter)));
-categorySelect.addEventListener("change", () => selectFilter(categorySelect.value));
-sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; render(); });
+if (grid) {
+  pills.forEach((b) => b.addEventListener("click", () => selectFilter(b.dataset.filter)));
+  categorySelect.addEventListener("change", () => selectFilter(categorySelect.value));
+  sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; render(); });
+  document.getElementById("search-clear").addEventListener("click", () => { state.query = ""; searchInput.value = ""; render(); });
+}
 
 /* 검색: 좁은 화면에서는 돋보기를 누르면 입력창이 열림 */
 searchForm.addEventListener("submit", (e) => {
@@ -193,39 +200,45 @@ searchForm.addEventListener("submit", (e) => {
   if (narrow && !searchForm.classList.contains("is-open")) {
     searchForm.classList.add("is-open"); searchInput.focus(); return;
   }
-  state.query = searchInput.value.trim();
+  const q = searchInput.value.trim();
+  if (!grid) { location.href = "index.html" + (q ? "?q=" + encodeURIComponent(q) : ""); return; }
+  state.query = q;
   searchForm.classList.remove("is-open");
   render();
   document.getElementById("catalog").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
 });
 searchInput.addEventListener("keydown", (e) => { if (e.key === "Escape") searchForm.classList.remove("is-open"); });
-document.getElementById("search-clear").addEventListener("click", () => { state.query = ""; searchInput.value = ""; render(); });
-
-// 카드의 "견적 요청" → 문의 폼의 필요한 장비를 미리 선택
-grid.addEventListener("click", (e) => {
-  const cta = e.target.closest(".card-cta");
-  if (!cta) return;
-  const product = allProducts.find((p) => p.name === cta.dataset.product);
-  let label = product && CATEGORY_LABELS[product.category];
-  if (label === "공기압축기") label = "기타 장비";
-  const select = document.getElementById("equipment");
-  const option = label && [...select.options].find((o) => o.textContent === label);
-  if (option) select.value = option.value || option.textContent;
-  const message = document.getElementById("message");
-  if (!message.value) message.value = "[" + cta.dataset.product + "] 임대 견적을 요청합니다.\n";
-});
 
 async function loadProducts() {
   let data = null;
   try { data = firebaseReady ? await fb.fetchProducts() : null; }
   catch (err) { console.error("장비 목록을 불러오지 못했습니다.", err); }
   allProducts = data && data.length ? data : PRODUCTS;
-  render();
+  const cat = params.get("category");
+  if (cat && [...categorySelect.options].some((o) => o.value === cat)) state.filter = cat;
+  state.query = (params.get("q") || "").trim();
+  searchInput.value = state.query;
+  selectFilter(state.filter);
 }
-loadProducts();
+if (grid) loadProducts();
 
 /* ---------- 견적 요청 폼 ---------- */
 const form = document.getElementById("contact-form");
+if (form) initContactForm(form);
+
+// 장비 카드의 "견적 요청"으로 들어오면 필요한 장비와 요청 사항을 미리 채움
+function prefillFromLink(form) {
+  const product = params.get("product");
+  let label = CATEGORY_LABELS[params.get("category")];
+  if (label === "공기압축기") label = "기타 장비";
+  const select = form.elements.equipment;
+  const option = label && [...select.options].find((o) => o.textContent === label);
+  if (option) select.value = option.value || option.textContent;
+  if (product && !form.elements.message.value) form.elements.message.value = "[" + product + "] 임대 견적을 요청합니다.\n";
+}
+
+function initContactForm(form) {
+prefillFromLink(form);
 const statusEl = document.getElementById("form-status");
 const submitBtn = form.querySelector('button[type="submit"]');
 
@@ -286,3 +299,6 @@ form.addEventListener("submit", async (e) => {
     submitBtn.disabled = false;
   }
 });
+}
+
+document.documentElement.dataset.ready = "true"; // 스크립트 준비 완료 표시 (테스트용)
