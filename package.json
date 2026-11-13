@@ -1,0 +1,11 @@
+{
+  "name": "shinhwa-webpage",
+  "private": true,
+  "description": "(주)신화건설기계 장비 임대 사이트. 빌드 없이 동작하며, package.json은 점검 테스트용이다.",
+  "scripts": {
+    "test": "node tests/smoke.test.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.47.0"
+  }
+}

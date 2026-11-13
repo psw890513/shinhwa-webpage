@@ -1,3 +1,4 @@
 # Python bytecode cache (created when running skill scripts)
 __pycache__/
 *.pyc
+node_modules/
