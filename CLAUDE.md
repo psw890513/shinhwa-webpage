@@ -20,3 +20,10 @@
 - Firebase 설정값(`js/firebase-config.js`)은 placeholder 상태일 수 있다. 설정 전에도 공개 사이트가 샘플 데이터로 동작해야 한다.
 - 보안 규칙은 `firestore.rules`에서 관리한다. 규칙을 바꾸면 README의 배포 안내도 함께 갱신한다.
 - 관리자 페이지는 `noindex` 설정을 유지한다.
+
+## 디자인 기준
+- 디자인 원본: Figma "홈페이지 v2" 페이지 (https://www.figma.com/design/F3MQev0FqHbad95LgVTX6B?node-id=9-131). 화면을 바꿀 때는 Figma와 코드를 함께 맞춘다.
+- 색과 글꼴은 `css/style.css`의 `:root` 변수를 쓴다. 안전 주황(`--signal`)은 전화번호와 핵심 버튼에만 쓴다.
+- 한글은 IBM Plex Sans KR, 규격 숫자는 Barlow Condensed(`.num`).
+- 장비 데이터의 `rating`("10 kVA" 형식)이 표와 현황판의 큰 숫자가 된다. 상태 문구는 "출고 가능 / 예약 중".
+- 디자인 작업에는 `.claude/skills/`의 frontend-design, ui-ux-pro-max 스킬을 쓴다.

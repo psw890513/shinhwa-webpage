@@ -9,8 +9,6 @@ try {
 }
 const firebaseReady = Boolean(fb && fb.isConfigured);
 
-const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
 /* ---------- 연도 ---------- */
 const yearEl = document.getElementById("year");
 if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -29,77 +27,12 @@ nav.addEventListener("click", (e) => {
   if (e.target.tagName === "A") setNav(false);
 });
 
-/* ---------- 메인 슬라이드 ---------- */
-(function initSlider() {
-  const slides = [...document.querySelectorAll(".slide")];
-  const dots = [...document.querySelectorAll(".slide-dots .dot")];
-  if (!slides.length) return;
-  let current = 0;
-  let timer = null;
-
-  // 사진 파일이 있을 때만 배경으로 적용
-  slides.forEach((slide) => {
-    const src = slide.dataset.img;
-    if (!src) return;
-    const img = new Image();
-    img.onload = () => {
-      slide.style.backgroundImage = "url('" + src + "')";
-      slide.classList.add("has-img");
-    };
-    img.src = src;
-  });
-
-  function go(i) {
-    current = (i + slides.length) % slides.length;
-    slides.forEach((s, n) => s.classList.toggle("is-active", n === current));
-    dots.forEach((d, n) => {
-      d.classList.toggle("is-active", n === current);
-      d.setAttribute("aria-selected", String(n === current));
-    });
-  }
-  function start() {
-    if (reduceMotion) return;
-    stop();
-    timer = setInterval(() => go(current + 1), 5000);
-  }
-  function stop() {
-    if (timer) clearInterval(timer);
-    timer = null;
-  }
-
-  dots.forEach((d, n) => d.addEventListener("click", () => { go(n); start(); }));
-  const hero = document.querySelector(".hero");
-  hero.addEventListener("mouseenter", stop);
-  hero.addEventListener("mouseleave", start);
-  start();
-})();
-
-/* ---------- 바로가기: 제품 탭 ---------- */
-(function initQuickTabs() {
-  const tabs = document.querySelectorAll(".qtab");
-  const panels = document.querySelectorAll(".qtab-panel");
-  tabs.forEach((tab) => {
-    const activate = () => {
-      tabs.forEach((t) => {
-        const on = t === tab;
-        t.classList.toggle("is-active", on);
-        t.setAttribute("aria-selected", String(on));
-      });
-      panels.forEach((p) => {
-        p.hidden = p.dataset.panel !== tab.dataset.tab;
-      });
-    };
-    tab.addEventListener("click", activate);
-    tab.addEventListener("mouseenter", activate);
-  });
-})();
-
 /* ---------- 공지사항 ---------- */
 (function initNotices() {
   const list = document.getElementById("notice-list");
   const more = document.getElementById("notice-more");
   const items = typeof NOTICES !== "undefined" ? NOTICES : [];
-  const LIMIT = 5;
+  const LIMIT = 3;
   let expanded = false;
 
   function render() {
@@ -107,13 +40,13 @@ nav.addEventListener("click", (e) => {
     const shown = expanded ? items : items.slice(0, LIMIT);
     shown.forEach((n) => {
       const li = document.createElement("li");
+      const date = document.createElement("time");
+      date.dateTime = n.date;
+      date.textContent = n.date.slice(5).replace("-", "."); // 2026-11-02 → 11.02
       const title = document.createElement("span");
       title.className = "notice-title";
       title.textContent = n.title;
-      const date = document.createElement("time");
-      date.dateTime = n.date;
-      date.textContent = n.date;
-      li.append(title, date);
+      li.append(date, title);
       list.appendChild(li);
     });
     if (!items.length) {
@@ -122,13 +55,13 @@ nav.addEventListener("click", (e) => {
       list.appendChild(li);
     }
     more.hidden = items.length <= LIMIT;
-    more.textContent = expanded ? "접기 «" : "더보기 »";
+    more.textContent = expanded ? "접기" : "전체 보기";
   }
   more.addEventListener("click", () => { expanded = !expanded; render(); });
   render();
 })();
 
-/* ---------- 오시는길: 지도 링크 ---------- */
+/* ---------- 오시는 길: 지도 링크 ---------- */
 (function initMapLinks() {
   const addr = document.getElementById("company-address");
   if (!addr || addr.textContent.includes("OO")) return; // 실제 주소 입력 전에는 지도 첫 화면으로
@@ -137,7 +70,7 @@ nav.addEventListener("click", (e) => {
   document.getElementById("kakao-map").href = "https://map.kakao.com/?q=" + q;
 })();
 
-/* ---------- 전화문의 팝업 ---------- */
+/* ---------- 전화 상담 팝업 ---------- */
 (function initPopup() {
   const popup = document.getElementById("call-popup");
   if (!popup) return;
@@ -147,85 +80,101 @@ nav.addEventListener("click", (e) => {
   if (Date.now() < hideUntil) return;
 
   popup.hidden = false;
-
-  function close() {
-    const checked = popup.querySelector('input[name="popup-hide"]:checked');
-    if (checked) {
-      const days = Number(checked.value);
-      try { localStorage.setItem(KEY, String(Date.now() + days * 86400000)); } catch (e) { /* 저장 불가 시 무시 */ }
-    }
+  popup.querySelector(".popup-close").addEventListener("click", () => { popup.hidden = true; });
+  popup.querySelector(".popup-hide").addEventListener("click", () => {
+    try { localStorage.setItem(KEY, String(Date.now() + 86400000)); } catch (e) { /* 저장 불가 시 이번만 닫음 */ }
     popup.hidden = true;
-  }
-  popup.querySelector(".popup-close").addEventListener("click", close);
-  popup.querySelectorAll('input[name="popup-hide"]').forEach((r) => r.addEventListener("change", close));
+  });
 })();
 
-/* ---------- 임대장비 규격표 ---------- */
+/* ---------- 장비 데이터 ---------- */
 const grid = document.getElementById("product-grid");
 const emptyMsg = document.getElementById("empty-msg");
 const filterBtns = document.querySelectorAll(".filter-btn");
+const boardList = document.getElementById("board-list");
 let allProducts = [];
 let currentFilter = "all";
 
-// 규격표의 한 행: 구분 | 장비명(+설명) | 주요 규격 | 상태 | 문의
-function createRow(product) {
-  const tr = document.createElement("tr");
+// 규격을 숫자와 단위로 나눔. rating 값이 없으면 장비명에서 찾음 (예: "디젤 발전기 10kVA")
+function ratingOf(product) {
+  const m = String(product.rating || product.name || "").match(/(\d[\d,.]*)\s*(kVA|kW|인치|HP|bar|A)/i);
+  return m ? { value: m[1], unit: m[2] } : { value: "", unit: "" };
+}
+function inFilter(p, filter) {
+  return filter === "all" || p.category === filter || (filter === "etc" && p.category === "compressor");
+}
+function el(tag, className, textContent) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (textContent != null) node.textContent = textContent;
+  return node;
+}
+function statusBadge(product) {
+  return el("span", "status status-" + product.status, STATUS_LABELS[product.status] || "");
+}
 
-  const cat = document.createElement("td");
-  cat.className = "col-cat";
-  cat.textContent = CATEGORY_LABELS[product.category] || "";
-
-  const name = document.createElement("td");
-  name.className = "col-name";
-  const strong = document.createElement("strong");
-  strong.textContent = product.name;
-  name.appendChild(strong);
-  if (product.summary) {
-    const small = document.createElement("span");
-    small.className = "product-summary";
-    small.textContent = product.summary;
-    name.appendChild(small);
+/* ---------- 현황판: 구분별로 큰 규격부터 5종 ---------- */
+function renderBoard() {
+  const size = (p) => parseFloat(ratingOf(p).value.replace(/,/g, "")) || 0;
+  const picked = [];
+  for (const [cat, n] of [["generator", 2], ["pump", 2], ["motor", 1]]) {
+    picked.push(...allProducts.filter((p) => p.category === cat).sort((a, b) => size(b) - size(a)).slice(0, n));
+  }
+  for (const p of allProducts) {
+    if (picked.length >= 5) break;
+    if (!picked.includes(p)) picked.push(p);
   }
 
-  const spec = document.createElement("td");
-  spec.className = "col-spec";
-  const list = document.createElement("ul");
-  list.className = "spec-list";
-  (product.spec || []).forEach((s) => {
-    const li = document.createElement("li");
-    li.textContent = s;
-    list.appendChild(li);
+  boardList.innerHTML = "";
+  picked.slice(0, 5).forEach((p) => {
+    const r = ratingOf(p);
+    const li = el("li");
+    const cap = el("div", "board-cap");
+    cap.append(el("span", "num", r.value), el("span", "unit", r.unit));
+    const name = el("div", "board-name");
+    const label = CATEGORY_LABELS[p.category] || "";
+    name.append(el("strong", "", p.name.replace(r.value + r.unit, "").trim() || p.name), el("span", "", label));
+    li.append(cap, name, statusBadge(p));
+    boardList.appendChild(li);
   });
-  spec.appendChild(list);
 
-  const status = document.createElement("td");
-  status.className = "col-status";
-  const badge = document.createElement("span");
-  badge.className = "status status-" + product.status;
-  badge.textContent = STATUS_LABELS[product.status] || "";
-  status.appendChild(badge);
+  const available = allProducts.filter((p) => p.status === "available").length;
+  document.getElementById("board-summary").textContent = "출고 가능 " + available + "종";
+  document.getElementById("board-count").textContent =
+    allProducts.length + "종 중 " + Math.min(5, picked.length) + "종 표시";
+}
 
-  const action = document.createElement("td");
-  action.className = "col-action";
-  const cta = document.createElement("a");
-  cta.className = "product-cta";
+/* ---------- 임대장비 표 ---------- */
+function createRow(product) {
+  const r = ratingOf(product);
+  const tr = el("tr");
+
+  const cap = el("td", "col-cap");
+  cap.append(el("span", "num", r.value), el("span", "unit", r.unit));
+
+  const name = el("td", "col-name");
+  name.appendChild(el("strong", "", product.name));
+  if (product.summary) name.appendChild(el("span", "", product.summary));
+
+  const spec = el("td", "col-spec", (product.spec || []).join(", "));
+
+  const status = el("td", "col-status");
+  status.appendChild(statusBadge(product));
+
+  const action = el("td", "col-action");
+  const cta = el("a", "product-cta", "견적 요청");
   cta.href = "#contact";
   cta.dataset.product = product.name;
-  cta.textContent = "견적문의";
   action.appendChild(cta);
 
-  tr.append(cat, name, spec, status, action);
+  tr.append(cap, name, spec, status, action);
   return tr;
 }
 
 function renderProducts(filter) {
   currentFilter = filter;
   grid.innerHTML = "";
-  const items = allProducts.filter((p) =>
-    filter === "all" ||
-    p.category === filter ||
-    (filter === "etc" && p.category === "compressor")
-  );
+  const items = allProducts.filter((p) => inFilter(p, filter));
   items.forEach((p) => grid.appendChild(createRow(p)));
   emptyMsg.hidden = items.length !== 0;
 }
@@ -238,15 +187,15 @@ function selectFilter(filter) {
   });
   renderProducts(filter);
 }
-
 filterBtns.forEach((btn) => btn.addEventListener("click", () => selectFilter(btn.dataset.filter)));
 
-// 메뉴·바로가기의 장비 링크: 규격표로 이동하면서 해당 구분만 보여 줌
-document.querySelectorAll("[data-goto-filter]").forEach((a) => {
-  a.addEventListener("click", () => selectFilter(a.dataset.gotoFilter));
-});
+function renderCounts() {
+  filterBtns.forEach((b) => {
+    b.querySelector(".count").textContent = allProducts.filter((p) => inFilter(p, b.dataset.filter)).length;
+  });
+}
 
-// 규격표의 "견적문의" → 문의 폼의 필요 장비를 미리 선택
+// 표의 "견적 요청" → 문의 폼의 필요한 장비를 미리 선택
 grid.addEventListener("click", (e) => {
   const cta = e.target.closest(".product-cta");
   if (!cta) return;
@@ -260,7 +209,7 @@ grid.addEventListener("click", (e) => {
   }
   const message = document.getElementById("message");
   if (message && !message.value) {
-    message.value = "[" + cta.dataset.product + "] 임대 견적 문의드립니다.\n";
+    message.value = "[" + cta.dataset.product + "] 임대 견적을 요청합니다.\n";
   }
 });
 
@@ -269,38 +218,41 @@ async function loadProducts() {
   try {
     data = firebaseReady ? await fb.fetchProducts() : null;
   } catch (err) {
-    console.error("제품 목록을 불러오지 못했습니다.", err);
+    console.error("장비 목록을 불러오지 못했습니다.", err);
   }
   allProducts = data && data.length ? data : PRODUCTS;
+  renderCounts();
+  renderBoard();
   renderProducts(currentFilter);
 }
 loadProducts();
 
-/* ---------- 견적문의 폼 ---------- */
+/* ---------- 견적 요청 폼 ---------- */
 const form = document.getElementById("contact-form");
 const statusEl = document.getElementById("form-status");
 const submitBtn = form.querySelector('button[type="submit"]');
 
 function showError(name, msg) {
-  const el = form.querySelector('[data-error-for="' + name + '"]');
-  if (el) el.textContent = msg;
+  const errEl = form.querySelector('[data-error-for="' + name + '"]');
+  if (errEl) errEl.textContent = msg;
   const input = form.elements[name];
   if (input) input.setAttribute("aria-invalid", msg ? "true" : "false");
 }
 
 function validate() {
-  let ok = true;
+  let firstInvalid = null;
   showError("name", "");
   showError("phone", "");
   if (!form.elements.name.value.trim()) {
-    showError("name", "회사명 또는 성명을 입력해 주세요.");
-    ok = false;
+    showError("name", "회사명이나 성함을 입력해 주세요.");
+    firstInvalid = form.elements.name;
   }
   if (!/^[0-9+\-\s()]{9,20}$/.test(form.elements.phone.value.trim())) {
     showError("phone", "연락처를 숫자와 - 로 입력해 주세요. 예: 010-1234-5678");
-    ok = false;
+    firstInvalid = firstInvalid || form.elements.phone;
   }
-  return ok;
+  if (firstInvalid) firstInvalid.focus();
+  return !firstInvalid;
 }
 
 function setStatus(msg, type) {
@@ -311,10 +263,7 @@ function setStatus(msg, type) {
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   setStatus("", "");
-  if (!validate()) {
-    setStatus("필수 항목을 확인해 주세요.", "error");
-    return;
-  }
+  if (!validate()) return;
 
   const data = new FormData(form);
   const payload = {
@@ -328,17 +277,17 @@ form.addEventListener("submit", async (e) => {
   // Firebase 설정 전: 메일 작성 창으로 대신 전달
   if (!firebaseReady) {
     const lines = [
-      "회사명 / 성명: " + payload.name,
+      "회사명 또는 성함: " + payload.name,
       "연락처: " + payload.phone,
-      "필요 장비: " + (payload.equipment || "미선택"),
+      "필요한 장비: " + (payload.equipment || "미선택"),
       "임대 기간: " + (payload.period || "미입력"),
       "",
-      "문의 내용:",
+      "현장 위치와 요청 사항:",
       payload.message || "(없음)"
     ];
     window.location.href =
       "mailto:" + CONTACT_EMAIL +
-      "?subject=" + encodeURIComponent("[견적 문의] " + payload.name) +
+      "?subject=" + encodeURIComponent("[견적 요청] " + payload.name) +
       "&body=" + encodeURIComponent(lines.join("\n"));
     setStatus("메일 작성 창이 열리지 않으면 " + CONTACT_EMAIL + " 로 보내 주세요.", "success");
     return;
@@ -348,10 +297,10 @@ form.addEventListener("submit", async (e) => {
   try {
     await fb.addInquiry(payload);
     form.reset();
-    setStatus("문의가 접수되었습니다. 담당자가 확인 후 연락드리겠습니다.", "success");
+    setStatus("견적 요청을 보냈습니다. 영업일 기준 하루 안에 연락드립니다.", "success");
   } catch (err) {
     console.error(err);
-    setStatus("전송하지 못했습니다. 잠시 후 다시 시도하거나 전화로 문의해 주세요.", "error");
+    setStatus("보내지 못했습니다. 잠시 후 다시 시도하거나 전화로 문의해 주세요.", "error");
   } finally {
     submitBtn.disabled = false;
   }

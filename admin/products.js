@@ -2,7 +2,7 @@ import { fetchProducts, saveProduct, deleteProduct } from "../js/firebase.js";
 import { initAdminGate, showMessage } from "./common.js";
 
 // 상태 라벨 (js/products.js 의 STATUS_LABELS 와 동일)
-const STATUS = { available: "임대 가능", reserved: "예약 중" };
+const STATUS = { available: "출고 가능", reserved: "예약 중" };
 
 const form = document.getElementById("product-form");
 const formTitle = document.getElementById("form-title");
@@ -27,6 +27,7 @@ function fillForm(p) {
   form.elements.id.value = p.id;
   form.elements.name.value = p.name || "";
   form.elements.category.value = p.category || "generator";
+  form.elements.rating.value = p.rating || "";
   form.elements.summary.value = p.summary || "";
   form.elements.spec.value = (p.spec || []).join("\n");
   form.elements.status.value = p.status || "available";
@@ -43,7 +44,7 @@ function renderRows() {
   if (!products.length) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
-    td.colSpan = 5;
+    td.colSpan = 6;
     td.className = "empty-row";
     td.textContent = "등록된 제품이 없습니다.";
     tr.appendChild(td);
@@ -59,6 +60,9 @@ function renderRows() {
     const strong = document.createElement("strong");
     strong.textContent = p.name;
     nameTd.appendChild(strong);
+
+    const ratingTd = document.createElement("td");
+    ratingTd.textContent = p.rating || "-";
 
     const catTd = document.createElement("td");
     catTd.textContent = CATEGORY_LABELS[p.category] || p.category;
@@ -89,7 +93,7 @@ function renderRows() {
     actions.append(editBtn, delBtn);
     actTd.appendChild(actions);
 
-    tr.append(nameTd, catTd, statusTd, specTd, actTd);
+    tr.append(nameTd, ratingTd, catTd, statusTd, specTd, actTd);
     rowsEl.appendChild(tr);
   });
 }
@@ -131,6 +135,7 @@ form.addEventListener("submit", async (e) => {
   const data = {
     name,
     category: form.elements.category.value,
+    rating: form.elements.rating.value.trim(),
     summary: form.elements.summary.value.trim(),
     spec: form.elements.spec.value
       .split("\n")

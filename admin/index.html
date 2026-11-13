@@ -74,6 +74,10 @@
                   <option value="etc">기타 장비</option>
                 </select>
               </div>
+              <div class="field">
+                <label for="p-rating">규격 (숫자와 단위)</label>
+                <input id="p-rating" name="rating" type="text" placeholder="예: 10 kVA, 4 인치, 3 HP">
+              </div>
               <div class="field full">
                 <label for="p-summary">한 줄 설명</label>
                 <input id="p-summary" name="summary" type="text">
@@ -85,7 +89,7 @@
               <div class="field">
                 <label for="p-status">임대 상태</label>
                 <select id="p-status" name="status">
-                  <option value="available">임대 가능</option>
+                  <option value="available">출고 가능</option>
                   <option value="reserved">예약 중</option>
                 </select>
               </div>
@@ -108,7 +112,7 @@
           <div class="table-wrap">
             <table>
               <thead>
-                <tr><th>제품명</th><th>카테고리</th><th>상태</th><th>사양</th><th></th></tr>
+                <tr><th>제품명</th><th>규격</th><th>카테고리</th><th>상태</th><th>사양</th><th></th></tr>
               </thead>
               <tbody id="product-rows"></tbody>
             </table>

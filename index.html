@@ -3,286 +3,193 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="(주)신화건설기계 발전기 · 엔진양수기 · 수중모터 임대. 규격과 임대 가능 여부를 확인하고 견적을 문의하세요.">
+  <meta name="description" content="(주)신화건설기계. 발전기, 엔진양수기, 수중모터 임대. 규격과 출고 가능 여부를 확인하고 견적을 요청하세요.">
   <title>(주)신화건설기계 | 발전기 · 엔진양수기 · 수중모터 임대</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- 헤더 -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="#top" class="logo">
-        <span class="logo-mark" aria-hidden="true">
-          <svg viewBox="0 0 40 40" width="40" height="40"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="5"/><path d="M27 13.5a9 9 0 1 0 0 13" fill="none" stroke="#e1a100" stroke-width="5" stroke-linecap="round"/></svg>
-        </span>
-        <span class="logo-text">
-          <small>SHINHWA CONSTRUCTION MACHINERY</small>
-          <strong>(주)신화건설기계</strong>
-        </span>
+        <svg class="logo-mark" width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="4" fill="#1F2933"/><path d="M23 11.5h-8.2a3.6 3.6 0 0 0 0 7.2h4.4a3.6 3.6 0 0 1 0 7.2H11" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="square"/><rect x="22" y="22" width="4" height="4" fill="#C2410C"/></svg>
+        (주)신화건설기계
       </a>
-
-      <div class="util">
-        <a href="#top">HOME</a>
+      <nav id="nav" class="site-nav">
+        <a href="#catalog">임대장비</a>
+        <a href="#about">회사소개</a>
         <a href="#contact">견적문의</a>
-      </div>
-
+        <a href="#notice">공지사항</a>
+        <a href="#location">오시는 길</a>
+      </nav>
+      <a class="header-phone" href="tel:00-0000-0000">
+        <span>임대 상담</span>
+        <strong class="num">00-0000-0000</strong>
+      </a>
       <button class="nav-toggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav">
         <span></span><span></span><span></span>
       </button>
-      <nav id="nav" class="site-nav">
-        <a href="#about">회사소개</a>
-        <a href="#catalog" data-goto-filter="generator">발전기</a>
-        <a href="#catalog" data-goto-filter="pump">엔진양수기</a>
-        <a href="#catalog" data-goto-filter="motor">수중모터</a>
-        <a href="#contact">견적문의하기</a>
-        <a href="#notice">고객센터</a>
-      </nav>
     </div>
   </header>
 
   <main id="top">
 
-    <!-- 메인 슬라이드 (사진은 images/hero-1.jpg ~ hero-3.jpg 를 넣으면 표시) -->
-    <section class="hero" aria-roledescription="carousel" aria-label="메인 소개">
-      <div class="slides">
-        <div class="slide is-active" data-img="images/hero-1.jpg" aria-roledescription="slide" aria-label="1 / 3">
-          <div class="container slide-text">
-            <p class="slide-title">Reliable Power on Every Site</p>
-            <p class="slide-sub">현장에 맞는 발전기를 필요한 기간만큼 임대해 드립니다.</p>
+    <!-- 첫 화면: 소개 + 장비 출고 현황판 -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <h1>발전기, 엔진양수기, 수중모터를<br>필요한 날만큼 임대합니다</h1>
+          <p class="hero-lead">운반과 설치, 회수까지 맡습니다. 쓰다가 고장이 나면 교체 장비를 바로 보냅니다.</p>
+          <div class="phone-block">
+            <p class="phone-label">임대 상담 전화</p>
+            <a class="phone-number num" href="tel:00-0000-0000">00-0000-0000</a>
+            <p class="phone-hours">평일 08:30–18:00, 토요일 08:30–13:00</p>
+          </div>
+          <div class="hero-actions">
+            <a href="#contact" class="btn btn-primary">견적 요청하기</a>
+            <a href="#catalog" class="btn btn-secondary">장비 규격 보기</a>
           </div>
         </div>
-        <div class="slide" data-img="images/hero-2.jpg" aria-roledescription="slide" aria-label="2 / 3">
-          <div class="container slide-text">
-            <p class="slide-title">Fast Drainage, Fast Recovery</p>
-            <p class="slide-sub">엔진양수기 · 수중모터로 침수 현장 배수를 빠르게 돕습니다.</p>
+
+        <div class="board" aria-label="장비 출고 현황">
+          <div class="board-head">
+            <h2>장비 출고 현황</h2>
+            <p id="board-summary"></p>
+          </div>
+          <ul id="board-list" class="board-list"></ul>
+          <div class="board-foot">
+            <p id="board-count"></p>
+            <a href="#catalog">전체 장비 보기</a>
           </div>
         </div>
-        <div class="slide" data-img="images/hero-3.jpg" aria-roledescription="slide" aria-label="3 / 3">
-          <div class="container slide-text">
-            <p class="slide-title">Customer Satisfaction First</p>
-            <p class="slide-sub">출고 전 점검부터 설치 · 회수까지 책임지는 (주)신화건설기계입니다.</p>
-          </div>
-        </div>
-      </div>
-      <div class="slide-dots" role="tablist" aria-label="슬라이드 선택">
-        <button class="dot is-active" type="button" aria-label="1번 슬라이드"></button>
-        <button class="dot" type="button" aria-label="2번 슬라이드"></button>
-        <button class="dot" type="button" aria-label="3번 슬라이드"></button>
       </div>
     </section>
 
-    <!-- 바로가기 4칸 -->
-    <section class="quick">
-      <div class="container quick-grid">
-
-        <!-- 제품 탭 -->
-        <div class="qbox qbox-product">
-          <div class="qtab-panels">
-            <a href="#catalog" class="qtab-panel is-active" data-panel="generator" data-goto-filter="generator">
-              <svg viewBox="0 0 200 130" class="equip-art" aria-hidden="true">
-                <rect x="20" y="22" width="160" height="80" rx="3" fill="#c8372d"/>
-                <rect x="20" y="96" width="160" height="12" fill="#2b2b2b"/>
-                <rect x="34" y="34" width="26" height="40" fill="#a92c23"/>
-                <rect x="140" y="34" width="26" height="40" fill="#a92c23"/>
-                <g fill="#8f241c"><rect x="72" y="36" width="56" height="3"/><rect x="72" y="44" width="56" height="3"/><rect x="72" y="52" width="56" height="3"/><rect x="72" y="60" width="56" height="3"/><rect x="72" y="68" width="56" height="3"/></g>
-                <rect x="88" y="12" width="10" height="12" fill="#555"/>
-                <rect x="34" y="108" width="20" height="8" fill="#2b2b2b"/><rect x="146" y="108" width="20" height="8" fill="#2b2b2b"/>
-              </svg>
-            </a>
-            <a href="#catalog" class="qtab-panel" data-panel="pump" data-goto-filter="pump" hidden>
-              <svg viewBox="0 0 200 130" class="equip-art" aria-hidden="true">
-                <rect x="40" y="30" width="120" height="70" rx="6" fill="none" stroke="#3a3a3a" stroke-width="6"/>
-                <rect x="62" y="44" width="54" height="40" rx="4" fill="#2f5aa8"/>
-                <circle cx="132" cy="64" r="16" fill="#9aa3ad"/>
-                <circle cx="132" cy="64" r="6" fill="#59616b"/>
-                <rect x="70" y="30" width="38" height="12" fill="#e1a100"/>
-                <rect x="148" y="58" width="24" height="12" fill="#59616b"/>
-              </svg>
-            </a>
-            <a href="#catalog" class="qtab-panel" data-panel="motor" data-goto-filter="motor" hidden>
-              <svg viewBox="0 0 200 130" class="equip-art" aria-hidden="true">
-                <rect x="80" y="18" width="40" height="84" rx="8" fill="#59616b"/>
-                <rect x="84" y="26" width="32" height="20" fill="#7d8690"/>
-                <g fill="#3f464e"><rect x="84" y="60" width="32" height="3"/><rect x="84" y="68" width="32" height="3"/><rect x="84" y="76" width="32" height="3"/></g>
-                <rect x="92" y="102" width="16" height="12" fill="#3f464e"/>
-                <path d="M120 34 h30 v-16" fill="none" stroke="#2f5aa8" stroke-width="7"/>
-                <path d="M30 118 h140" stroke="#9cc3e6" stroke-width="4"/>
-              </svg>
-            </a>
-            <span class="qplus" aria-hidden="true">+</span>
-          </div>
-          <div class="qtabs" role="tablist" aria-label="주요 장비">
-            <button type="button" class="qtab is-active" data-tab="generator" role="tab" aria-selected="true">발전기</button>
-            <button type="button" class="qtab" data-tab="pump" role="tab" aria-selected="false">엔진양수기</button>
-            <button type="button" class="qtab" data-tab="motor" role="tab" aria-selected="false">수중모터</button>
-          </div>
-        </div>
-
-        <!-- 임대/제작문의 -->
-        <div class="qbox qbox-call">
-          <h2>임대/견적문의</h2>
-          <p class="qdesc">아래 연락처로 문의하시면<br>친절하게 상담해 드리겠습니다.</p>
-          <p class="qtel"><span>TEL</span> <a href="tel:00-0000-0000">00-0000-0000</a></p>
-          <p class="qmail"><span>E-mail</span> <a href="mailto:info@example.com">info@example.com</a></p>
-          <svg viewBox="0 0 120 100" class="qart" aria-hidden="true">
-            <path d="M18 34c0-14 18-22 42-22s42 8 42 22v6H84v-8c0-4-10-8-24-8s-24 4-24 8v8H18z" fill="#2b2b2b"/>
-            <rect x="26" y="42" width="68" height="46" rx="6" fill="#3a3a3a"/>
-            <g fill="#9aa3ad"><rect x="38" y="52" width="10" height="7"/><rect x="55" y="52" width="10" height="7"/><rect x="72" y="52" width="10" height="7"/><rect x="38" y="64" width="10" height="7"/><rect x="55" y="64" width="10" height="7"/><rect x="72" y="64" width="10" height="7"/><rect x="38" y="76" width="10" height="7"/><rect x="55" y="76" width="10" height="7"/><rect x="72" y="76" width="10" height="7"/></g>
-          </svg>
-        </div>
-
-        <!-- 공지사항 -->
-        <div class="qbox qbox-notice" id="notice">
-          <div class="qhead">
+    <!-- 공지사항 + 오시는 길 -->
+    <section class="strip">
+      <div class="container strip-inner">
+        <div id="notice" class="notices">
+          <div class="strip-head">
             <h2>공지사항</h2>
-            <button type="button" id="notice-more" class="more" hidden>더보기 »</button>
+            <button type="button" id="notice-more" class="text-link" hidden>전체 보기</button>
           </div>
           <ul id="notice-list" class="notice-list"></ul>
         </div>
-
-        <!-- 오시는길 -->
-        <div class="qbox qbox-map">
-          <h2>오시는길</h2>
-          <p class="qdesc">(주)신화건설기계 오시는 길을<br>알려드립니다.</p>
-          <a href="#location" class="btn-mini">바로가기 »</a>
-          <svg viewBox="0 0 120 120" class="qart" aria-hidden="true">
-            <path d="M20 88l18-30 22 6 18-22 24 10-6 40-30 14-34-6z" fill="#e3e5e8" stroke="#c4c8cd" stroke-width="2"/>
-            <path d="M74 14a18 18 0 0 0-18 18c0 14 18 34 18 34s18-20 18-34a18 18 0 0 0-18-18z" fill="#d63a2f"/>
-            <circle cx="74" cy="32" r="7" fill="#fff"/>
-          </svg>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- 회사소개 -->
-    <section id="about" class="section">
-      <div class="container">
-        <h2 class="section-title">회사소개</h2>
-        <div class="about">
-          <p class="about-lead">(주)신화건설기계는 발전기, 엔진양수기, 수중모터 등 현장용 산업기계를 임대합니다. 장비는 출고 전에 점검을 마치고, 사용 중 고장이 나면 교체 장비를 보내 작업이 멈추지 않도록 합니다.</p>
-          <table class="info-table">
-            <tbody>
-              <tr><th scope="row">상호</th><td>(주)신화건설기계</td></tr>
-              <tr><th scope="row">대표</th><td>OOO</td></tr>
-              <tr><th scope="row">주요 장비</th><td>발전기, 엔진양수기, 수중모터, 공기압축기, 용접기</td></tr>
-              <tr><th scope="row">임대 방식</th><td>일 단위 · 월 단위 · 장기 계약</td></tr>
-              <tr><th scope="row">서비스</th><td>운반 · 설치 · 회수, 고장 시 교체 장비 지원</td></tr>
-            </tbody>
-          </table>
+        <div id="location" class="directions">
+          <h2>오시는 길</h2>
+          <p><span id="company-address">OO도 OO시 OO읍 OO길 00</span><br>장비 야적장과 사무실이 함께 있습니다.</p>
+          <div class="map-links">
+            <a class="btn btn-secondary" id="naver-map" href="https://map.naver.com/" target="_blank" rel="noopener">네이버 지도</a>
+            <a class="btn btn-secondary" id="kakao-map" href="https://map.kakao.com/" target="_blank" rel="noopener">카카오맵</a>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- 임대장비 -->
-    <section id="catalog" class="section section-gray">
+    <section id="catalog" class="section">
       <div class="container">
-        <h2 class="section-title">임대장비</h2>
-        <p class="section-desc">규격과 임대 가능 여부를 확인하세요. 표에 없는 규격도 문의하시면 구해 드립니다.</p>
+        <header class="section-head">
+          <h2>임대장비</h2>
+          <p>규격 숫자로 찾고, 상태를 확인한 뒤 견적을 요청하세요. 표에 없는 규격도 구해 드립니다.</p>
+        </header>
 
         <div class="filters" role="tablist" aria-label="장비 구분">
-          <button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">전체</button>
-          <button class="filter-btn" data-filter="generator" role="tab" aria-selected="false">발전기</button>
-          <button class="filter-btn" data-filter="pump" role="tab" aria-selected="false">엔진양수기</button>
-          <button class="filter-btn" data-filter="motor" role="tab" aria-selected="false">수중모터</button>
-          <button class="filter-btn" data-filter="etc" role="tab" aria-selected="false">기타 장비</button>
+          <button class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">전체 <span class="count"></span></button>
+          <button class="filter-btn" data-filter="generator" role="tab" aria-selected="false">발전기 <span class="count"></span></button>
+          <button class="filter-btn" data-filter="pump" role="tab" aria-selected="false">엔진양수기 <span class="count"></span></button>
+          <button class="filter-btn" data-filter="motor" role="tab" aria-selected="false">수중모터 <span class="count"></span></button>
+          <button class="filter-btn" data-filter="etc" role="tab" aria-selected="false">기타 장비 <span class="count"></span></button>
         </div>
 
-        <div class="table-scroll">
-          <table class="spec-table">
-            <thead>
-              <tr>
-                <th scope="col">구분</th>
-                <th scope="col">장비명</th>
-                <th scope="col">주요 규격</th>
-                <th scope="col">상태</th>
-                <th scope="col"><span class="sr-only">문의</span></th>
-              </tr>
-            </thead>
-            <tbody id="product-grid" aria-live="polite"></tbody>
-          </table>
-        </div>
-        <p id="empty-msg" class="empty-msg" hidden>해당 구분의 장비가 없습니다.</p>
+        <table class="spec-table">
+          <thead>
+            <tr>
+              <th scope="col">규격</th>
+              <th scope="col">장비</th>
+              <th scope="col">주요 사양</th>
+              <th scope="col">상태</th>
+              <th scope="col"><span class="sr-only">견적 요청</span></th>
+            </tr>
+          </thead>
+          <tbody id="product-grid" aria-live="polite"></tbody>
+        </table>
+        <p id="empty-msg" class="empty-msg" hidden>이 구분에는 등록된 장비가 없습니다. 전화로 문의하시면 구해 드립니다.</p>
       </div>
     </section>
 
-    <!-- 견적문의 -->
-    <section id="contact" class="section">
-      <div class="container">
-        <h2 class="section-title">견적문의하기</h2>
-        <p class="section-desc">장비, 기간, 현장 위치를 남겨 주시면 견적을 연락드립니다.</p>
-
-        <div class="contact">
-          <form id="contact-form" class="contact-form" novalidate>
-            <div class="form-row">
-              <div class="field">
-                <label for="name">회사명 / 성명 <span class="req">*</span></label>
-                <input id="name" name="name" type="text" required autocomplete="name">
-                <p class="error" data-error-for="name"></p>
-              </div>
-              <div class="field">
-                <label for="phone">연락처 <span class="req">*</span></label>
-                <input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="010-0000-0000">
-                <p class="error" data-error-for="phone"></p>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="field">
-                <label for="equipment">필요 장비</label>
-                <select id="equipment" name="equipment">
-                  <option value="">선택</option>
-                  <option>발전기</option>
-                  <option>엔진양수기</option>
-                  <option>수중모터</option>
-                  <option>기타 장비</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="period">임대 기간</label>
-                <input id="period" name="period" type="text" placeholder="예: 12/1 ~ 12/15">
-              </div>
-            </div>
-            <div class="field">
-              <label for="message">문의 내용</label>
-              <textarea id="message" name="message" rows="5" placeholder="현장 위치, 수량, 요청 사항"></textarea>
-            </div>
-            <div class="form-foot">
-              <button type="submit" class="btn btn-primary">문의 접수</button>
-              <p id="form-status" class="form-status" role="status"></p>
-            </div>
-          </form>
-
-          <dl class="contact-info">
-            <div><dt>전화</dt><dd><a href="tel:00-0000-0000">00-0000-0000</a></dd></div>
-            <div><dt>팩스</dt><dd>00-0000-0000</dd></div>
-            <div><dt>이메일</dt><dd><a href="mailto:info@example.com">info@example.com</a></dd></div>
-            <div><dt>운영</dt><dd>평일 08:30–18:00<br>토 08:30–13:00</dd></div>
+    <!-- 회사소개 -->
+    <section id="about" class="section section-plate">
+      <div class="container about">
+        <div class="about-intro">
+          <h2>회사소개</h2>
+          <p class="about-lead">(주)신화건설기계는 현장에서 쓰는 발전기, 엔진양수기, 수중모터를 임대합니다. 모든 장비는 출고 전에 점검하고, 점검 날짜를 장비마다 기록해 둡니다.</p>
+          <dl class="facts">
+            <div><dt>상호</dt><dd>(주)신화건설기계</dd></div>
+            <div><dt>대표</dt><dd>OOO</dd></div>
+            <div><dt>사업자등록번호</dt><dd>000-00-00000</dd></div>
           </dl>
         </div>
+        <ul class="services">
+          <li><h3>하루부터 장기까지</h3><p>작업 기간에 맞춰 일 단위, 월 단위로 계약합니다. 기간이 늘어나면 전화 한 통으로 연장됩니다.</p></li>
+          <li><h3>운반, 설치, 회수</h3><p>장비를 현장까지 싣고 가서 설치하고, 작업이 끝나면 회수합니다.</p></li>
+          <li><h3>고장 나면 교체 장비</h3><p>사용 중 멈추면 같은 규격의 장비를 보내 작업이 끊기지 않게 합니다.</p></li>
+        </ul>
       </div>
     </section>
 
-    <!-- 오시는길 -->
-    <section id="location" class="section section-gray">
-      <div class="container">
-        <h2 class="section-title">오시는길</h2>
-        <div class="location">
-          <table class="info-table">
-            <tbody>
-              <tr><th scope="row">주소</th><td id="company-address">OO도 OO시 OO읍 OO길 00</td></tr>
-              <tr><th scope="row">전화</th><td>00-0000-0000</td></tr>
-              <tr><th scope="row">운영 시간</th><td>평일 08:30–18:00 · 토 08:30–13:00 · 일요일 · 공휴일 휴무</td></tr>
-            </tbody>
-          </table>
-          <div class="map-links">
-            <a class="btn btn-outline" id="naver-map" href="https://map.naver.com/" target="_blank" rel="noopener">네이버 지도에서 보기</a>
-            <a class="btn btn-outline" id="kakao-map" href="https://map.kakao.com/" target="_blank" rel="noopener">카카오맵에서 보기</a>
-          </div>
+    <!-- 견적 요청 -->
+    <section id="contact" class="section">
+      <div class="container contact">
+        <div class="contact-intro">
+          <h2>견적 요청</h2>
+          <p>장비, 기간, 현장 위치를 남겨 주시면 영업일 기준 하루 안에 견적을 보내 드립니다. 급하면 전화가 가장 빠릅니다.</p>
+          <a class="phone-number num" href="tel:00-0000-0000">00-0000-0000</a>
+          <a class="contact-mail" href="mailto:info@example.com">info@example.com</a>
         </div>
+
+        <form id="contact-form" class="contact-form" novalidate>
+          <div class="form-row">
+            <div class="field">
+              <label for="name">회사명 또는 성함 <span class="req">(필수)</span></label>
+              <input id="name" name="name" type="text" required autocomplete="name" placeholder="예: OO건설 김OO">
+              <p class="error" data-error-for="name"></p>
+            </div>
+            <div class="field">
+              <label for="phone">연락처 <span class="req">(필수)</span></label>
+              <input id="phone" name="phone" type="tel" required autocomplete="tel" placeholder="010-0000-0000">
+              <p class="error" data-error-for="phone"></p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="equipment">필요한 장비</label>
+              <select id="equipment" name="equipment">
+                <option value="">선택</option>
+                <option>발전기</option>
+                <option>엔진양수기</option>
+                <option>수중모터</option>
+                <option>기타 장비</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="period">임대 기간</label>
+              <input id="period" name="period" type="text" placeholder="예: 12월 1일부터 15일까지">
+            </div>
+          </div>
+          <div class="field">
+            <label for="message">현장 위치와 요청 사항</label>
+            <textarea id="message" name="message" rows="5" placeholder="현장 주소, 필요 수량, 설치 조건을 적어 주세요"></textarea>
+          </div>
+          <div class="form-foot">
+            <button type="submit" class="btn btn-primary">견적 요청 보내기</button>
+            <p class="form-note">보내 주신 연락처로만 답변드립니다.</p>
+          </div>
+          <p id="form-status" class="form-status" role="status"></p>
+        </form>
       </div>
     </section>
 
@@ -290,22 +197,28 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>(주)신화건설기계 | 대표이사 : OOO | 주소 : OO도 OO시 OO읍 OO길 00 | 사업자등록번호 : 000-00-00000</p>
-      <p>TEL : 00-0000-0000 | FAX : 00-0000-0000 | E-mail : info@example.com</p>
-      <p class="copy">Copyright &copy; <span id="year"></span> SHINHWA CONSTRUCTION MACHINERY. All rights reserved.</p>
+      <p class="footer-name">(주)신화건설기계</p>
+      <ul class="footer-info">
+        <li>대표 OOO</li>
+        <li>사업자등록번호 000-00-00000</li>
+        <li>OO도 OO시 OO읍 OO길 00</li>
+        <li>전화 00-0000-0000</li>
+        <li>팩스 00-0000-0000</li>
+        <li>info@example.com</li>
+      </ul>
+      <p class="copy">&copy; <span id="year"></span> (주)신화건설기계</p>
     </div>
   </footer>
 
-  <!-- 전화문의 팝업 -->
-  <aside id="call-popup" class="call-popup" aria-label="전화문의" hidden>
-    <button type="button" class="popup-close" aria-label="닫기">×</button>
-    <p class="popup-title">전화문의 : <a href="tel:00-0000-0000">00-0000-0000</a></p>
-    <p class="popup-desc">모바일에서 버튼을 누르면 전화로 연결됩니다.</p>
-    <a href="tel:00-0000-0000" class="btn btn-primary popup-call">전화연결</a>
-    <div class="popup-hide">
-      <label><input type="radio" name="popup-hide" value="1"> 하루동안</label>
-      <label><input type="radio" name="popup-hide" value="7"> 일주일동안 보지않기</label>
-    </div>
+  <!-- 전화 상담 팝업 -->
+  <aside id="call-popup" class="call-popup" aria-label="전화 상담" hidden>
+    <button type="button" class="popup-close" aria-label="닫기">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <p class="popup-label">전화 상담</p>
+    <p class="popup-number num">00-0000-0000</p>
+    <a href="tel:00-0000-0000" class="btn btn-primary">전화 걸기</a>
+    <button type="button" class="text-link popup-hide">오늘 하루 보지 않기</button>
   </aside>
 
   <script src="js/products.js"></script>
