@@ -31,6 +31,7 @@
 4. 버그: `systematic-debugging`으로 원인부터 찾는다.
 5. 완료 전: `npm test`를 실행하고 결과를 보고한다(`verification-before-completion`). 테스트 없이 "됐다"고 하지 않는다.
 6. 마무리: 작업 브랜치에 커밋하고 PR로 `main`에 합친다. `main`이 GitHub Pages로 배포된다.
+- 기능 점검표: `docs/features.html` → 아티팩트 https://claude.ai/artifact/Fk9dZ3Behqm8LYVjoHmm3s . 기능을 추가·변경·수정하거나 설정(Firebase, 회사 정보, 도메인)이 바뀌면 이 파일의 상태·테스트·주의점과 마지막 점검 날짜를 고치고 같은 아티팩트로 다시 게시한다.
 - 점검표는 `docs/dev-check.md`, 다음 작업은 `docs/plan.md`에 둔다. 확인된 항목은 점검표에서 위 칸으로 옮긴다.
 - 짧은 질문이나 작은 수정에는 위 절차를 생략해 사용량을 아낀다.
 
