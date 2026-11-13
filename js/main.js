@@ -8,6 +8,14 @@ try {
   console.warn("Firebase를 불러오지 못했습니다. 샘플 데이터로 표시합니다.", err);
 }
 const firebaseReady = Boolean(fb && fb.isConfigured);
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function el(tag, className, textContent) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (textContent != null) node.textContent = textContent;
+  return node;
+}
 
 /* ---------- 연도 ---------- */
 const yearEl = document.getElementById("year");
@@ -16,16 +24,32 @@ if (yearEl) yearEl.textContent = new Date().getFullYear();
 /* ---------- 모바일 메뉴 ---------- */
 const navToggle = document.querySelector(".nav-toggle");
 const nav = document.getElementById("nav");
-
 function setNav(open) {
   navToggle.setAttribute("aria-expanded", String(open));
   navToggle.setAttribute("aria-label", open ? "메뉴 닫기" : "메뉴 열기");
   nav.classList.toggle("is-open", open);
 }
 navToggle.addEventListener("click", () => setNav(navToggle.getAttribute("aria-expanded") !== "true"));
-nav.addEventListener("click", (e) => {
-  if (e.target.tagName === "A") setNav(false);
-});
+nav.addEventListener("click", (e) => { if (e.target.tagName === "A") setNav(false); });
+
+/* ---------- 배너 슬라이드 ---------- */
+(function initBanner() {
+  const slides = [...document.querySelectorAll(".slide")];
+  const dots = [...document.querySelectorAll(".dot")];
+  let current = 0, timer = null;
+  function go(i) {
+    current = (i + slides.length) % slides.length;
+    slides.forEach((s, n) => s.classList.toggle("is-active", n === current));
+    dots.forEach((d, n) => { d.classList.toggle("is-active", n === current); d.setAttribute("aria-selected", String(n === current)); });
+  }
+  function start() { if (reduceMotion) return; stop(); timer = setInterval(() => go(current + 1), 5000); }
+  function stop() { if (timer) clearInterval(timer); timer = null; }
+  dots.forEach((d, n) => d.addEventListener("click", () => { go(n); start(); }));
+  const banner = document.querySelector(".banner");
+  banner.addEventListener("mouseenter", stop);
+  banner.addEventListener("mouseleave", start);
+  start();
+})();
 
 /* ---------- 공지사항 ---------- */
 (function initNotices() {
@@ -34,26 +58,16 @@ nav.addEventListener("click", (e) => {
   const items = typeof NOTICES !== "undefined" ? NOTICES : [];
   const LIMIT = 3;
   let expanded = false;
-
   function render() {
     list.innerHTML = "";
-    const shown = expanded ? items : items.slice(0, LIMIT);
-    shown.forEach((n) => {
-      const li = document.createElement("li");
-      const date = document.createElement("time");
+    (expanded ? items : items.slice(0, LIMIT)).forEach((n) => {
+      const li = el("li");
+      const date = el("time", "", n.date.slice(5).replace("-", "."));
       date.dateTime = n.date;
-      date.textContent = n.date.slice(5).replace("-", "."); // 2026-11-02 → 11.02
-      const title = document.createElement("span");
-      title.className = "notice-title";
-      title.textContent = n.title;
-      li.append(date, title);
+      li.append(date, el("span", "notice-title", n.title));
       list.appendChild(li);
     });
-    if (!items.length) {
-      const li = document.createElement("li");
-      li.textContent = "등록된 공지사항이 없습니다.";
-      list.appendChild(li);
-    }
+    if (!items.length) list.appendChild(el("li", "", "등록된 공지사항이 없습니다."));
     more.hidden = items.length <= LIMIT;
     more.textContent = expanded ? "접기" : "전체 보기";
   }
@@ -70,168 +84,143 @@ nav.addEventListener("click", (e) => {
   document.getElementById("kakao-map").href = "https://map.kakao.com/?q=" + q;
 })();
 
-/* ---------- 전화 상담 팝업 ---------- */
-(function initPopup() {
-  const popup = document.getElementById("call-popup");
-  if (!popup) return;
-  const KEY = "callPopupHideUntil";
-  let hideUntil = 0;
-  try { hideUntil = Number(localStorage.getItem(KEY)) || 0; } catch (e) { hideUntil = 0; }
-  if (Date.now() < hideUntil) return;
-
-  popup.hidden = false;
-  popup.querySelector(".popup-close").addEventListener("click", () => { popup.hidden = true; });
-  popup.querySelector(".popup-hide").addEventListener("click", () => {
-    try { localStorage.setItem(KEY, String(Date.now() + 86400000)); } catch (e) { /* 저장 불가 시 이번만 닫음 */ }
-    popup.hidden = true;
-  });
-})();
-
-/* ---------- 장비 데이터 ---------- */
+/* ---------- 장비 목록 ---------- */
 const grid = document.getElementById("product-grid");
 const emptyMsg = document.getElementById("empty-msg");
-const filterBtns = document.querySelectorAll(".filter-btn");
-const boardList = document.getElementById("board-list");
+const pills = document.querySelectorAll(".pill");
+const categorySelect = document.getElementById("category-select");
+const sortSelect = document.getElementById("sort-select");
+const countEl = document.getElementById("list-count");
+const searchForm = document.getElementById("search-form");
+const searchInput = document.getElementById("search-input");
+const searchNote = document.getElementById("search-note");
 let allProducts = [];
-let currentFilter = "all";
+const state = { filter: "all", sort: "default", query: "" };
 
-// 규격을 숫자와 단위로 나눔. rating 값이 없으면 장비명에서 찾음 (예: "디젤 발전기 10kVA")
-function ratingOf(product) {
-  const m = String(product.rating || product.name || "").match(/(\d[\d,.]*)\s*(kVA|kW|인치|HP|bar|A)/i);
-  return m ? { value: m[1], unit: m[2] } : { value: "", unit: "" };
+function ratingOf(p) {
+  const m = String(p.rating || p.name || "").match(/(\d[\d,.]*)\s*(kVA|kW|인치|HP|bar|A)/i);
+  return m ? { value: m[1], unit: m[2], size: parseFloat(m[1].replace(/,/g, "")) } : { value: "", unit: "", size: 0 };
 }
 function inFilter(p, filter) {
   return filter === "all" || p.category === filter || (filter === "etc" && p.category === "compressor");
 }
-function el(tag, className, textContent) {
-  const node = document.createElement(tag);
-  if (className) node.className = className;
-  if (textContent != null) node.textContent = textContent;
-  return node;
+function matchesQuery(p, q) {
+  if (!q) return true;
+  const hay = [p.name, p.rating, p.summary, CATEGORY_LABELS[p.category], ...(p.spec || [])].join(" ").toLowerCase().replace(/\s+/g, "");
+  return q.toLowerCase().replace(/\s+/g, "").split(/[,]/).every((t) => hay.includes(t));
 }
-function statusBadge(product) {
-  return el("span", "status status-" + product.status, STATUS_LABELS[product.status] || "");
-}
+const won = (n) => Number(n).toLocaleString("ko-KR") + "원";
 
-/* ---------- 현황판: 구분별로 큰 규격부터 5종 ---------- */
-function renderBoard() {
-  const size = (p) => parseFloat(ratingOf(p).value.replace(/,/g, "")) || 0;
-  const picked = [];
-  for (const [cat, n] of [["generator", 2], ["pump", 2], ["motor", 1]]) {
-    picked.push(...allProducts.filter((p) => p.category === cat).sort((a, b) => size(b) - size(a)).slice(0, n));
+function createCard(p) {
+  const r = ratingOf(p);
+  const li = el("li", "card");
+
+  const media = el("div", "card-media");
+  const img = document.createElement("img");
+  if (p.image) {
+    img.src = p.image; img.className = "is-photo"; img.alt = p.name;
+  } else {
+    img.src = "images/equip/" + (p.art || CATEGORY_ART[p.category] || "generator") + ".svg";
+    img.alt = ""; // 장식용 그림 (이름이 바로 아래에 있음)
   }
-  for (const p of allProducts) {
-    if (picked.length >= 5) break;
-    if (!picked.includes(p)) picked.push(p);
+  img.loading = "lazy"; img.width = 240; img.height = 180;
+  media.append(img, el("span", "card-status status-" + p.status, STATUS_LABELS[p.status] || ""));
+
+  const body = el("div", "card-body");
+  body.appendChild(el("h3", "card-title", p.name));
+
+  const meta = el("dl", "card-meta");
+  const row = (parent, k, v, cls) => { const d = el("div", cls || ""); d.append(el("dt", "", k), el("dd", "", v)); parent.appendChild(d); };
+  row(meta, "규격", r.value ? r.value + " " + r.unit : "-");
+  row(meta, "구분", CATEGORY_LABELS[p.category] || "-");
+  if (p.spec && p.spec.length) row(meta, "사양", p.spec[0]);
+  body.appendChild(meta);
+
+  const price = el("dl", "card-price");
+  const pr = p.prices || {};
+  if (pr.day || pr.week || pr.month) {
+    if (pr.day) row(price, "1일", won(pr.day), "is-day");
+    if (pr.week) row(price, "7일", won(pr.week));
+    if (pr.month) row(price, "30일", won(pr.month));
+  } else {
+    row(price, "임대료", "견적 문의", "is-day");
   }
+  body.appendChild(price);
 
-  boardList.innerHTML = "";
-  picked.slice(0, 5).forEach((p) => {
-    const r = ratingOf(p);
-    const li = el("li");
-    const cap = el("div", "board-cap");
-    cap.append(el("span", "num", r.value), el("span", "unit", r.unit));
-    const name = el("div", "board-name");
-    const label = CATEGORY_LABELS[p.category] || "";
-    name.append(el("strong", "", p.name.replace(r.value + r.unit, "").trim() || p.name), el("span", "", label));
-    li.append(cap, name, statusBadge(p));
-    boardList.appendChild(li);
-  });
+  const foot = el("div", "card-foot");
+  foot.appendChild(el("span", "card-code", "장비코드 " + String(p.id || "").toUpperCase()));
+  const cta = el("a", "card-cta", "견적 요청");
+  cta.href = "#contact"; cta.dataset.product = p.name;
+  foot.appendChild(cta);
+  body.appendChild(foot);
 
-  const available = allProducts.filter((p) => p.status === "available").length;
-  document.getElementById("board-summary").textContent = "출고 가능 " + available + "종";
-  document.getElementById("board-count").textContent =
-    allProducts.length + "종 중 " + Math.min(5, picked.length) + "종 표시";
+  li.append(media, body);
+  return li;
 }
 
-/* ---------- 임대장비 표 ---------- */
-function createRow(product) {
-  const r = ratingOf(product);
-  const tr = el("tr");
+function render() {
+  let items = allProducts.filter((p) => inFilter(p, state.filter) && matchesQuery(p, state.query));
+  const byName = (a, b) => a.name.localeCompare(b.name, "ko");
+  if (state.sort === "name") items = [...items].sort(byName);
+  if (state.sort === "rating-desc") items = [...items].sort((a, b) => ratingOf(b).size - ratingOf(a).size);
+  if (state.sort === "rating-asc") items = [...items].sort((a, b) => ratingOf(a).size - ratingOf(b).size);
+  if (state.sort === "available") items = [...items].sort((a, b) => (a.status === "available" ? 0 : 1) - (b.status === "available" ? 0 : 1));
 
-  const cap = el("td", "col-cap");
-  cap.append(el("span", "num", r.value), el("span", "unit", r.unit));
-
-  const name = el("td", "col-name");
-  name.appendChild(el("strong", "", product.name));
-  if (product.summary) name.appendChild(el("span", "", product.summary));
-
-  const spec = el("td", "col-spec", (product.spec || []).join(", "));
-
-  const status = el("td", "col-status");
-  status.appendChild(statusBadge(product));
-
-  const action = el("td", "col-action");
-  const cta = el("a", "product-cta", "견적 요청");
-  cta.href = "#contact";
-  cta.dataset.product = product.name;
-  action.appendChild(cta);
-
-  tr.append(cap, name, spec, status, action);
-  return tr;
-}
-
-function renderProducts(filter) {
-  currentFilter = filter;
   grid.innerHTML = "";
-  const items = allProducts.filter((p) => inFilter(p, filter));
-  items.forEach((p) => grid.appendChild(createRow(p)));
+  items.forEach((p) => grid.appendChild(createCard(p)));
   emptyMsg.hidden = items.length !== 0;
+  const label = state.filter === "all" ? "" : CATEGORY_LABELS[state.filter] + " ";
+  countEl.textContent = "총 " + items.length + "개의 " + label + "장비가 준비되어 있습니다.";
+
+  searchNote.hidden = !state.query;
+  document.getElementById("search-text").textContent = "'" + state.query + "' 검색 결과";
 }
 
 function selectFilter(filter) {
-  filterBtns.forEach((b) => {
-    const on = b.dataset.filter === filter;
-    b.classList.toggle("is-active", on);
-    b.setAttribute("aria-selected", String(on));
-  });
-  renderProducts(filter);
+  state.filter = filter;
+  pills.forEach((b) => { const on = b.dataset.filter === filter; b.classList.toggle("is-active", on); b.setAttribute("aria-selected", String(on)); });
+  categorySelect.value = filter;
+  render();
 }
-filterBtns.forEach((btn) => btn.addEventListener("click", () => selectFilter(btn.dataset.filter)));
+pills.forEach((b) => b.addEventListener("click", () => selectFilter(b.dataset.filter)));
+categorySelect.addEventListener("change", () => selectFilter(categorySelect.value));
+sortSelect.addEventListener("change", () => { state.sort = sortSelect.value; render(); });
 
-// 장비 사진을 누르면 그 구분만 표에 보여 줌
-document.querySelectorAll("[data-goto-filter]").forEach((el) => {
-  el.addEventListener("click", () => {
-    selectFilter(el.dataset.gotoFilter);
-    document.querySelector(".filters").scrollIntoView({ behavior: "smooth", block: "start" });
-  });
+/* 검색: 좁은 화면에서는 돋보기를 누르면 입력창이 열림 */
+searchForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const narrow = window.matchMedia("(max-width: 900px)").matches;
+  if (narrow && !searchForm.classList.contains("is-open")) {
+    searchForm.classList.add("is-open"); searchInput.focus(); return;
+  }
+  state.query = searchInput.value.trim();
+  searchForm.classList.remove("is-open");
+  render();
+  document.getElementById("catalog").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
 });
+searchInput.addEventListener("keydown", (e) => { if (e.key === "Escape") searchForm.classList.remove("is-open"); });
+document.getElementById("search-clear").addEventListener("click", () => { state.query = ""; searchInput.value = ""; render(); });
 
-function renderCounts() {
-  filterBtns.forEach((b) => {
-    b.querySelector(".count").textContent = allProducts.filter((p) => inFilter(p, b.dataset.filter)).length;
-  });
-}
-
-// 표의 "견적 요청" → 문의 폼의 필요한 장비를 미리 선택
+// 카드의 "견적 요청" → 문의 폼의 필요한 장비를 미리 선택
 grid.addEventListener("click", (e) => {
-  const cta = e.target.closest(".product-cta");
+  const cta = e.target.closest(".card-cta");
   if (!cta) return;
   const product = allProducts.find((p) => p.name === cta.dataset.product);
-  const select = document.getElementById("equipment");
   let label = product && CATEGORY_LABELS[product.category];
   if (label === "공기압축기") label = "기타 장비";
-  if (select && label) {
-    const option = [...select.options].find((o) => o.textContent === label);
-    if (option) select.value = option.value || option.textContent;
-  }
+  const select = document.getElementById("equipment");
+  const option = label && [...select.options].find((o) => o.textContent === label);
+  if (option) select.value = option.value || option.textContent;
   const message = document.getElementById("message");
-  if (message && !message.value) {
-    message.value = "[" + cta.dataset.product + "] 임대 견적을 요청합니다.\n";
-  }
+  if (!message.value) message.value = "[" + cta.dataset.product + "] 임대 견적을 요청합니다.\n";
 });
 
 async function loadProducts() {
   let data = null;
-  try {
-    data = firebaseReady ? await fb.fetchProducts() : null;
-  } catch (err) {
-    console.error("장비 목록을 불러오지 못했습니다.", err);
-  }
+  try { data = firebaseReady ? await fb.fetchProducts() : null; }
+  catch (err) { console.error("장비 목록을 불러오지 못했습니다.", err); }
   allProducts = data && data.length ? data : PRODUCTS;
-  renderCounts();
-  renderBoard();
-  renderProducts(currentFilter);
+  render();
 }
 loadProducts();
 
@@ -243,26 +232,19 @@ const submitBtn = form.querySelector('button[type="submit"]');
 function showError(name, msg) {
   const errEl = form.querySelector('[data-error-for="' + name + '"]');
   if (errEl) errEl.textContent = msg;
-  const input = form.elements[name];
-  if (input) input.setAttribute("aria-invalid", msg ? "true" : "false");
+  form.elements[name].setAttribute("aria-invalid", msg ? "true" : "false");
 }
-
 function validate() {
-  let firstInvalid = null;
-  showError("name", "");
-  showError("phone", "");
-  if (!form.elements.name.value.trim()) {
-    showError("name", "회사명이나 성함을 입력해 주세요.");
-    firstInvalid = form.elements.name;
-  }
+  let first = null;
+  showError("name", ""); showError("phone", "");
+  if (!form.elements.name.value.trim()) { showError("name", "회사명이나 성함을 입력해 주세요."); first = form.elements.name; }
   if (!/^[0-9+\-\s()]{9,20}$/.test(form.elements.phone.value.trim())) {
     showError("phone", "연락처를 숫자와 - 로 입력해 주세요. 예: 010-1234-5678");
-    firstInvalid = firstInvalid || form.elements.phone;
+    first = first || form.elements.phone;
   }
-  if (firstInvalid) firstInvalid.focus();
-  return !firstInvalid;
+  if (first) first.focus();
+  return !first;
 }
-
 function setStatus(msg, type) {
   statusEl.textContent = msg;
   statusEl.className = "form-status" + (type ? " is-" + type : "");
@@ -272,7 +254,6 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   setStatus("", "");
   if (!validate()) return;
-
   const data = new FormData(form);
   const payload = {
     name: (data.get("name") || "").trim().slice(0, 100),
@@ -282,21 +263,13 @@ form.addEventListener("submit", async (e) => {
     message: (data.get("message") || "").trim().slice(0, 2000)
   };
 
-  // Firebase 설정 전: 메일 작성 창으로 대신 전달
   if (!firebaseReady) {
     const lines = [
-      "회사명 또는 성함: " + payload.name,
-      "연락처: " + payload.phone,
-      "필요한 장비: " + (payload.equipment || "미선택"),
-      "임대 기간: " + (payload.period || "미입력"),
-      "",
-      "현장 위치와 요청 사항:",
-      payload.message || "(없음)"
+      "회사명 또는 성함: " + payload.name, "연락처: " + payload.phone,
+      "필요한 장비: " + (payload.equipment || "미선택"), "임대 기간: " + (payload.period || "미입력"),
+      "", "현장 위치와 요청 사항:", payload.message || "(없음)"
     ];
-    window.location.href =
-      "mailto:" + CONTACT_EMAIL +
-      "?subject=" + encodeURIComponent("[견적 요청] " + payload.name) +
-      "&body=" + encodeURIComponent(lines.join("\n"));
+    window.location.href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("[견적 요청] " + payload.name) + "&body=" + encodeURIComponent(lines.join("\n"));
     setStatus("메일 작성 창이 열리지 않으면 " + CONTACT_EMAIL + " 로 보내 주세요.", "success");
     return;
   }

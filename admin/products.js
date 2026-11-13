@@ -28,6 +28,11 @@ function fillForm(p) {
   form.elements.name.value = p.name || "";
   form.elements.category.value = p.category || "generator";
   form.elements.rating.value = p.rating || "";
+  form.elements.art.value = p.art || "";
+  form.elements.image.value = p.image || "";
+  form.elements.priceDay.value = (p.prices && p.prices.day) || "";
+  form.elements.priceWeek.value = (p.prices && p.prices.week) || "";
+  form.elements.priceMonth.value = (p.prices && p.prices.month) || "";
   form.elements.summary.value = p.summary || "";
   form.elements.spec.value = (p.spec || []).join("\n");
   form.elements.status.value = p.status || "available";
@@ -136,6 +141,13 @@ form.addEventListener("submit", async (e) => {
     name,
     category: form.elements.category.value,
     rating: form.elements.rating.value.trim(),
+    art: form.elements.art.value,
+    image: form.elements.image.value.trim(),
+    prices: {
+      day: Number(form.elements.priceDay.value) || null,
+      week: Number(form.elements.priceWeek.value) || null,
+      month: Number(form.elements.priceMonth.value) || null
+    },
     summary: form.elements.summary.value.trim(),
     spec: form.elements.spec.value
       .split("\n")

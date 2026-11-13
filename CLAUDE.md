@@ -22,8 +22,10 @@
 - 관리자 페이지는 `noindex` 설정을 유지한다.
 
 ## 디자인 기준
-- 디자인 원본: Figma "홈페이지 v2" 페이지 (https://www.figma.com/design/F3MQev0FqHbad95LgVTX6B?node-id=9-131). 화면을 바꿀 때는 Figma와 코드를 함께 맞춘다.
-- 색과 글꼴은 `css/style.css`의 `:root` 변수를 쓴다. 안전 주황(`--signal`)은 전화번호와 핵심 버튼에만 쓴다.
-- 한글은 IBM Plex Sans KR, 규격 숫자는 Barlow Condensed(`.num`).
-- 장비 데이터의 `rating`("10 kVA" 형식)이 표와 현황판의 큰 숫자가 된다. 상태 문구는 "출고 가능 / 예약 중".
-- 디자인 작업에는 `.claude/skills/`의 frontend-design, ui-ux-pro-max 스킬을 쓴다.
+- 참고 사이트: https://sycmc.com/rental-products (장비 임대몰 구성). 구성과 배치는 참고하되 그 회사의 사진, 로고, 문구는 쓰지 않는다.
+- 구성 순서: 헤더(로고, 메뉴, 검색) → 장비 배너 → 카테고리 알약 버튼(모바일은 드롭다운) → 장비 카드 목록 → 상담 띠 → 견적 요청 → 회사소개/공지/오시는 길 → 남색 하단. 모바일은 하단 고정 바(전화 상담, 견적 요청).
+- 색과 글꼴은 `css/style.css`의 `:root` 변수를 쓴다. 주황(`--accent`)은 현재 메뉴, 1일 임대료, 핵심 버튼에만 쓴다. 글꼴은 Pretendard.
+- 장비 카드 그림은 `images/equip/*.svg`(직접 그린 그림). 실제 사진은 장비 데이터의 `image`에 넣는다.
+- 임대료(`prices`)는 실제 값만 넣는다. 없으면 "견적 문의"로 표시된다. 가격을 지어내지 않는다.
+- Figma 파일(https://www.figma.com/design/F3MQev0FqHbad95LgVTX6B)은 이전 디자인(v1, v2) 기록용이다. 현재 디자인의 기준은 코드다.
+- 디자인 작업에는 `.claude/skills/`의 frontend-design, ui-ux-pro-max 스킬을 쓴다. 단 사용자가 참고 사이트를 지정하면 그 구성을 우선한다.

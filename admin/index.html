@@ -78,6 +78,33 @@
                 <label for="p-rating">규격 (숫자와 단위)</label>
                 <input id="p-rating" name="rating" type="text" placeholder="예: 10 kVA, 4 인치, 3 HP">
               </div>
+              <div class="field">
+                <label for="p-art">사진이 없을 때 그림</label>
+                <select id="p-art" name="art">
+                  <option value="">구분에 맞춰 자동</option>
+                  <option value="generator">발전기</option>
+                  <option value="pump">엔진양수기</option>
+                  <option value="motor">수중모터</option>
+                  <option value="compressor">공기압축기</option>
+                  <option value="welder">용접기</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="p-image">사진 주소 (선택)</label>
+                <input id="p-image" name="image" type="text" placeholder="예: https://.../photo.jpg 또는 images/내사진.jpg">
+              </div>
+              <div class="field">
+                <label for="p-day">임대료 1일 (원)</label>
+                <input id="p-day" name="priceDay" type="number" min="0" step="1000" placeholder="비우면 '견적 문의'">
+              </div>
+              <div class="field">
+                <label for="p-week">임대료 7일 (원)</label>
+                <input id="p-week" name="priceWeek" type="number" min="0" step="1000">
+              </div>
+              <div class="field">
+                <label for="p-month">임대료 30일 (원)</label>
+                <input id="p-month" name="priceMonth" type="number" min="0" step="1000">
+              </div>
               <div class="field full">
                 <label for="p-summary">한 줄 설명</label>
                 <input id="p-summary" name="summary" type="text">

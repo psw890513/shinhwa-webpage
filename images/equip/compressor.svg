@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 180" role="img" aria-label="이동식 공기압축기">
+  <ellipse cx="124" cy="158" rx="96" ry="7" fill="#000" opacity=".08"/>
+  <path d="M42 118L10 132" stroke="#2B2F36" stroke-width="6" stroke-linecap="round"/><circle cx="10" cy="132" r="5" fill="#4A4F57"/>
+  <rect x="40" y="52" width="170" height="74" rx="10" fill="#F2C230"/>
+  <rect x="40" y="52" width="170" height="18" rx="10" fill="#F7D560"/><rect x="40" y="62" width="170" height="8" fill="#F7D560"/>
+  <path d="M124 70v56" stroke="#D9A81E" stroke-width="2"/>
+  <g fill="#D9A81E"><rect x="54" y="82" width="56" height="4" rx="1"/><rect x="54" y="92" width="56" height="4" rx="1"/><rect x="54" y="102" width="56" height="4" rx="1"/><rect x="54" y="112" width="56" height="4" rx="1"/></g>
+  <rect x="140" y="82" width="56" height="22" rx="3" fill="#2B2F36"/><circle cx="154" cy="93" r="6" fill="#fff"/><path d="M154 93l3-4" stroke="#E35F14" stroke-width="2"/><circle cx="172" cy="93" r="4" fill="#8FD3A0"/>
+  <rect x="44" y="124" width="162" height="8" rx="2" fill="#2B2F36"/>
+  <circle cx="132" cy="138" r="18" fill="#2B2F36"/><circle cx="132" cy="138" r="8" fill="#8A9099"/>
+  <rect x="190" y="40" width="10" height="14" rx="1" fill="#4A4F57"/>
+</svg>
