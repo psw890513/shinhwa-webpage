@@ -1,4 +1,4 @@
-const CONTACT_EMAIL = "info@example.com"; // Firebase 미설정 시 메일 작성용 주소
+let CONTACT_EMAIL = "info@example.com"; // Firebase 미설정 시 메일 작성용 주소 (data/content.json 의 회사 이메일로 바뀜)
 
 // Firebase는 동적으로 불러옵니다. CDN 로드에 실패해도 샘플 데이터로 사이트가 계속 동작하도록 하기 위함입니다.
 let fb = null;
@@ -10,6 +10,57 @@ try {
 const firebaseReady = Boolean(fb && fb.isConfigured);
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const params = new URLSearchParams(location.search);
+
+/* ---------- 사이트 콘텐츠 (data/content.json, 관리자 페이지에서 수정) ---------- */
+// GitHub Pages가 파일을 몇 분간 캐시하므로 1분 단위로 주소를 바꿔 최신 파일을 받습니다.
+let content = null;
+try {
+  const res = await fetch("data/content.json?v=" + Math.floor(Date.now() / 60000));
+  if (res.ok) content = await res.json();
+} catch (err) {
+  console.warn("콘텐츠 파일을 불러오지 못했습니다. 기본 데이터로 표시합니다.", err);
+}
+const NOTICE_ITEMS = (content && content.notices) || (typeof NOTICES !== "undefined" ? NOTICES : []);
+
+(function applyCompany() {
+  const c = content && content.company;
+  if (!c) return;
+  document.querySelectorAll("[data-company]").forEach((n) => {
+    const v = c[n.dataset.company];
+    if (v != null && v !== "") n.textContent = v;
+  });
+  if (c.phone) document.querySelectorAll("[data-tel]").forEach((a) => (a.href = "tel:" + c.phone.replace(/[^0-9+]/g, "")));
+  if (c.email) {
+    CONTACT_EMAIL = c.email;
+    document.querySelectorAll("[data-mail]").forEach((a) => (a.href = "mailto:" + c.email));
+  }
+})();
+
+(function buildBanner() {
+  const slidesEl = document.querySelector(".banner .slides");
+  const dotsEl = document.querySelector(".banner .dots");
+  const list = content && content.banner;
+  if (!slidesEl || !list || !list.length) return;
+  slidesEl.innerHTML = ""; dotsEl.innerHTML = "";
+  list.forEach((b, n) => {
+    const slide = el("div", "slide" + (n === 0 ? " is-active" : ""));
+    slide.setAttribute("aria-roledescription", "slide");
+    slide.setAttribute("aria-label", (n + 1) + " / " + list.length);
+    const bg = el("p", "slide-bg", b.bg || ""); bg.setAttribute("aria-hidden", "true");
+    const img = document.createElement("img");
+    img.src = b.image || "images/equip/" + (b.art || "generator") + ".svg";
+    if (b.image) img.className = "is-photo";
+    img.alt = b.title || ""; img.width = 480; img.height = 360;
+    const cap = el("p", "slide-caption");
+    cap.append(el("strong", "", b.title || ""), document.createTextNode(" " + (b.desc || "")));
+    slide.append(bg, img, cap);
+    slidesEl.appendChild(slide);
+    const dot = el("button", "dot" + (n === 0 ? " is-active" : ""));
+    dot.type = "button"; dot.setAttribute("aria-label", (n + 1) + "번 배너");
+    dotsEl.appendChild(dot);
+  });
+  dotsEl.hidden = list.length < 2;
+})();
 
 function el(tag, className, textContent) {
   const node = document.createElement(tag);
@@ -58,7 +109,7 @@ nav.addEventListener("click", (e) => { if (e.target.tagName === "A") setNav(fals
   const list = document.getElementById("notice-list");
   if (!list) return;
   const more = document.getElementById("notice-more");
-  const items = typeof NOTICES !== "undefined" ? NOTICES : [];
+  const items = NOTICE_ITEMS;
   const LIMIT = 3;
   let expanded = list.dataset.show === "all";
   function render() {
@@ -67,7 +118,16 @@ nav.addEventListener("click", (e) => { if (e.target.tagName === "A") setNav(fals
       const li = el("li");
       const date = el("time", "", expanded ? n.date.replace(/-/g, ".") : n.date.slice(5).replace("-", "."));
       date.dateTime = n.date;
-      li.append(date, el("span", "notice-title", n.title));
+      if (expanded && n.body) {
+        // 공지사항 페이지: 내용이 있으면 눌러서 펼쳐 봄
+        const d = el("details", "notice-item");
+        const sum = el("summary");
+        sum.append(date, el("span", "notice-title", n.title));
+        d.append(sum, el("p", "notice-body pre-line", n.body));
+        li.appendChild(d);
+      } else {
+        li.append(date, el("span", "notice-title", n.title));
+      }
       list.appendChild(li);
     });
     if (!items.length) list.appendChild(el("li", "", "등록된 공지사항이 없습니다."));
@@ -210,10 +270,7 @@ searchForm.addEventListener("submit", (e) => {
 searchInput.addEventListener("keydown", (e) => { if (e.key === "Escape") searchForm.classList.remove("is-open"); });
 
 async function loadProducts() {
-  let data = null;
-  try { data = firebaseReady ? await fb.fetchProducts() : null; }
-  catch (err) { console.error("장비 목록을 불러오지 못했습니다.", err); }
-  allProducts = data && data.length ? data : PRODUCTS;
+  allProducts = (content && content.products) || PRODUCTS;
   const cat = params.get("category");
   if (cat && [...categorySelect.options].some((o) => o.value === cat)) state.filter = cat;
   state.query = (params.get("q") || "").trim();

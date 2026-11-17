@@ -139,3 +139,29 @@ td.msg { max-width: 320px; white-space: pre-wrap; word-break: break-all; }
   .inq-layout:not(.has-detail) .inq-detail { display: none; }
   .inq-back { display: inline-block; }
 }
+
+/* ---------- 콘텐츠 관리 ---------- */
+.notice-ok { background: #dcfce7; color: #14532d; }
+.gh-card h2 { margin-bottom: .5rem; }
+.gh-steps { margin: 1rem 0; padding-left: 1.3rem; display: grid; gap: .35rem; font-size: .92rem; }
+.gh-form { display: flex; gap: .5rem; flex-wrap: wrap; }
+.gh-form input { flex: 1; min-width: 0; font: inherit; padding: .6rem .75rem; border: 1px solid var(--c-line); border-radius: 8px; }
+#gh-on { display: flex; justify-content: space-between; align-items: center; gap: .75rem; flex-wrap: wrap; }
+#gh-on[hidden] { display: none; }
+.btn-small.icon { padding: .25rem .55rem; }
+.admin-list { display: grid; }
+.admin-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--c-line); }
+.admin-list li > div:first-child { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; min-width: 0; }
+.banner-box { margin: 0 0 1rem; padding: 1rem 1.2rem; border: 1px solid var(--c-line); border-radius: 10px; }
+.banner-box legend { padding: 0 .4rem; font-weight: 700; }
+.photo-row { display: flex; gap: .5rem; align-items: center; }
+.photo-row input[type="text"] { flex: 1; min-width: 0; }
+.photo-row input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.photo-btn { white-space: nowrap; }
+.photo-preview { display: block; max-width: 220px; max-height: 160px; margin-top: .5rem; border-radius: 8px; object-fit: cover; }
+.form-grid .error { grid-column: 1 / -1; }
+.save-bar { position: sticky; bottom: 0; z-index: 20; background: var(--c-dark); color: #fff; padding-bottom: env(safe-area-inset-bottom, 0px); }
+.save-bar-inner { display: flex; justify-content: space-between; align-items: center; gap: .75rem; flex-wrap: wrap; padding: .75rem 0; }
+.save-bar-actions { display: flex; gap: .5rem; }
+.save-bar .btn-small { background: transparent; color: #fff; border-color: rgba(255,255,255,.4); }
+#panel td { vertical-align: middle; }

@@ -697,3 +697,12 @@ img { max-width: 100%; }
   html { scroll-behavior: auto; }
   .slide, .dot, .btn { transition: none; }
 }
+.pre-line { white-space: pre-line; }
+.slide img.is-photo { width: min(420px, 80vw); aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; }
+.notice-item { flex: 1; min-width: 0; }
+.notice-item summary { display: flex; gap: 14px; cursor: pointer; list-style: none; }
+.notice-item summary::-webkit-details-marker { display: none; }
+.notice-item summary::after { content: "+"; margin-left: auto; color: var(--gray-500); }
+.notice-item[open] summary::after { content: "−"; }
+.notice-body { margin-top: 12px; padding: 14px 16px; background: var(--gray-50); border-radius: 8px; color: var(--gray-600); }
+@media (max-width: 600px) { .notice-item summary { flex-direction: column; gap: 4px; } .notice-item summary::after { display: none; } }

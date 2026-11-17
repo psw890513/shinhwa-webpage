@@ -1,5 +1,6 @@
 /*
- * 기본 데이터 (Firebase 설정 전, 또는 Firestore가 비어 있을 때 사용)
+ * 기본 데이터. 실제 내용은 data/content.json (관리자 페이지에서 수정)이고,
+ * 그 파일을 못 읽을 때만 아래 값을 씁니다. 구분·상태 이름 상수는 항상 씁니다.
  *   category: "generator" | "pump" | "motor" | "etc"
  *   rating:   규격. "숫자 단위" 형식 (예: "10 kVA")
  *   art:      사진이 없을 때 쓸 그림. "generator" | "pump" | "motor" | "compressor" | "welder"
