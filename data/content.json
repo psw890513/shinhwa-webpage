@@ -1,0 +1,230 @@
+{
+  "updatedAt": "2026-11-17",
+  "company": {
+    "phone": "00-0000-0000",
+    "fax": "00-0000-0000",
+    "email": "info@example.com",
+    "address": "OO도 OO시 OO읍 OO길 00",
+    "ceo": "OOO",
+    "bizNo": "000-00-00000",
+    "hours": "평일 08:30–18:00\n토요일 08:30–13:00",
+    "intro": "(주)신화건설기계는 현장에서 쓰는 발전기, 엔진양수기, 수중모터를 임대합니다."
+  },
+  "banner": [
+    {
+      "bg": "500kVA",
+      "art": "generator",
+      "image": "",
+      "title": "디젤 발전기 500kVA",
+      "desc": "대형 설비 전원용"
+    },
+    {
+      "bg": "6INCH",
+      "art": "pump",
+      "image": "",
+      "title": "엔진양수기 6인치",
+      "desc": "저수지와 하천 공사용"
+    },
+    {
+      "bg": "10HP",
+      "art": "motor",
+      "image": "",
+      "title": "수중모터 10HP",
+      "desc": "터파기 현장 배수용"
+    }
+  ],
+  "products": [
+    {
+      "image": "",
+      "prices": {},
+      "id": "gen-10kva",
+      "name": "디젤 발전기 10kVA",
+      "category": "generator",
+      "rating": "10 kVA",
+      "art": "generator",
+      "summary": "소규모 현장과 행사용",
+      "spec": [
+        "연료 경유",
+        "저소음 방음형"
+      ],
+      "status": "available"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "gen-50kva",
+      "name": "디젤 발전기 50kVA",
+      "category": "generator",
+      "rating": "50 kVA",
+      "art": "generator",
+      "summary": "건설 현장 전원용",
+      "spec": [
+        "연료 경유",
+        "자동 전압 조정"
+      ],
+      "status": "available"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "gen-150kva",
+      "name": "디젤 발전기 150kVA",
+      "category": "generator",
+      "rating": "150 kVA",
+      "art": "generator",
+      "summary": "공장 비상 전원용",
+      "spec": [
+        "연료 경유",
+        "ATS 연동"
+      ],
+      "status": "reserved"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "gen-500kva",
+      "name": "디젤 발전기 500kVA",
+      "category": "generator",
+      "rating": "500 kVA",
+      "art": "generator",
+      "summary": "대형 설비 전원용",
+      "spec": [
+        "연료 경유",
+        "트레일러 탑재형"
+      ],
+      "status": "available"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "pump-2inch",
+      "name": "엔진양수기 2인치",
+      "category": "pump",
+      "rating": "2 인치",
+      "art": "pump",
+      "summary": "배수와 관개용 휴대형",
+      "spec": [
+        "분당 약 600L",
+        "가솔린 엔진"
+      ],
+      "status": "available"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "pump-4inch",
+      "name": "엔진양수기 4인치",
+      "category": "pump",
+      "rating": "4 인치",
+      "art": "pump",
+      "summary": "침수 복구 현장용",
+      "spec": [
+        "분당 약 2,000L",
+        "디젤 엔진"
+      ],
+      "status": "available"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "pump-6inch",
+      "name": "엔진양수기 6인치",
+      "category": "pump",
+      "rating": "6 인치",
+      "art": "pump",
+      "summary": "저수지와 하천 공사용",
+      "spec": [
+        "분당 약 4,500L",
+        "디젤 엔진"
+      ],
+      "status": "reserved"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "motor-3hp",
+      "name": "수중모터 3HP",
+      "category": "motor",
+      "rating": "3 HP",
+      "art": "motor",
+      "summary": "지하 공간과 터널 물빼기",
+      "spec": [
+        "단상 220V",
+        "자동 부유 스위치"
+      ],
+      "status": "available"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "motor-10hp",
+      "name": "수중모터 10HP",
+      "category": "motor",
+      "rating": "10 HP",
+      "art": "motor",
+      "summary": "터파기 현장 배수용",
+      "spec": [
+        "삼상 380V",
+        "토출 구경 4인치"
+      ],
+      "status": "available"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "etc-compressor",
+      "name": "스크루 공기압축기",
+      "category": "etc",
+      "rating": "7 bar",
+      "art": "compressor",
+      "summary": "연속 운전 현장용",
+      "spec": [
+        "디젤 구동",
+        "이동식"
+      ],
+      "status": "available"
+    },
+    {
+      "image": "",
+      "prices": {},
+      "id": "etc-welder",
+      "name": "엔진 용접기",
+      "category": "etc",
+      "rating": "300 A",
+      "art": "welder",
+      "summary": "발전 겸용",
+      "spec": [
+        "용접과 발전 겸용",
+        "디젤 엔진"
+      ],
+      "status": "available"
+    }
+  ],
+  "notices": [
+    {
+      "title": "동절기 발전기 임대 예약 안내",
+      "date": "2026-11-02",
+      "body": ""
+    },
+    {
+      "title": "엔진양수기 6인치 새로 들어왔습니다",
+      "date": "2026-10-20",
+      "body": ""
+    },
+    {
+      "title": "추석 연휴 운영 시간 안내",
+      "date": "2026-09-25",
+      "body": ""
+    },
+    {
+      "title": "장마철 양수기 임대는 미리 예약해 주세요",
+      "date": "2026-07-01",
+      "body": ""
+    },
+    {
+      "title": "홈페이지를 새로 열었습니다",
+      "date": "2026-06-15",
+      "body": ""
+    }
+  ]
+}

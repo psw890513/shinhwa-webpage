@@ -3,7 +3,7 @@
 ## 프로젝트 개요
 (주)신화건설기계의 산업기계(발전기, 양수기 등) 임대 웹사이트.
 - 공개 사이트: `index.html`, `about.html`, `contact.html`, `notice.html`, `location.html` (정적 HTML/CSS/JS)
-- 관리자: `admin/` (제품 관리, 접수 내역) — Firebase Firestore / Authentication 사용
+- 관리자: `admin/index.html` 콘텐츠 관리(장비·공지·회사 정보·배너 → GitHub API로 `data/content.json` 저장, 토큰 로그인), `admin/inquiries.html` 견적 요청 관리(Firebase 필요, 연결 전에는 `?demo`)
 - 개발 브랜치: `claude/affectionate-heisenberg-faf044` (PR로 `main`에 합침)
 - 배포: GitHub Pages `main` → https://psw890513.github.io/shinhwa-webpage/
 - 테스트: `npm test` (`tests/smoke.test.js`, Playwright)
@@ -19,7 +19,9 @@
 
 ## 개발 규칙
 - 빌드 도구 없이 동작하는 정적 구조를 유지한다.
-- 제품 데이터 기본값은 `js/products.js`, 실제 데이터는 Firestore `products` 컬렉션이다.
+- 사이트 콘텐츠(장비, 공지, 회사 정보, 배너)의 기준은 `data/content.json`이다. 사용자가 관리자 페이지에서 고치면 `main`에 바로 커밋된다. `js/products.js`는 이 파일을 못 읽을 때의 기본값과 상수(구분·상태 이름)만 둔다.
+- 작업 전 반드시 `git fetch origin main && git merge origin/main`으로 사용자가 고친 `data/content.json`을 받는다. 오래된 사본으로 덮어쓰지 않는다. 회사 정보·장비·공지 값을 코드에 직접 넣지 말고 `data/content.json`을 고친다.
+- Firebase는 나중에 연결한다(사용자 결정). 지금은 견적 요청 접수·관리에만 쓴다.
 - Firebase 설정값(`js/firebase-config.js`)은 placeholder 상태일 수 있다. 설정 전에도 공개 사이트가 샘플 데이터로 동작해야 한다.
 - 보안 규칙은 `firestore.rules`에서 관리한다. 규칙을 바꾸면 README의 배포 안내도 함께 갱신한다.
 - 관리자 페이지는 `noindex` 설정을 유지한다.
@@ -37,7 +39,7 @@
 
 ## 디자인 기준
 - 참고 사이트: https://sycmc.com/rental-products (장비 임대몰 구성). 구성과 배치는 참고하되 그 회사의 사진, 로고, 문구는 쓰지 않는다.
-- 페이지 구성: 메뉴마다 별도 페이지다. `index.html`(임대/렌탈: 배너 → 카테고리 → 장비 카드 → 상담 띠), `about.html`(회사소개), `contact.html`(견적문의), `notice.html`(공지사항), `location.html`(오시는 길). 헤더·하단은 페이지마다 같은 마크업을 쓴다(바꾸면 5개 모두 수정). 모바일은 하단 고정 바(전화 상담, 견적 요청).
+- 페이지 구성: 메뉴마다 별도 페이지다. `index.html`(임대/렌탈: 배너 → 카테고리 → 장비 카드 → 상담 띠), `about.html`(회사소개), `contact.html`(견적문의), `notice.html`(공지사항), `location.html`(오시는 길). 헤더·하단은 페이지마다 같은 마크업을 쓴다(구조를 바꾸면 5개 모두 수정). 회사 정보가 들어가는 곳은 `data-company`, `data-tel`, `data-mail` 속성으로 표시하고 `js/main.js`가 채운다. 모바일은 하단 고정 바(전화 상담, 견적 요청).
 - 색과 글꼴은 `css/style.css`의 `:root` 변수를 쓴다. 주황(`--accent`)은 현재 메뉴, 1일 임대료, 핵심 버튼에만 쓴다. 글꼴은 Pretendard.
 - 장비 카드 그림은 `images/equip/*.svg`(직접 그린 그림). 실제 사진은 장비 데이터의 `image`에 넣는다.
 - 임대료(`prices`)는 실제 값만 넣는다. 없으면 "견적 문의"로 표시된다. 가격을 지어내지 않는다.
