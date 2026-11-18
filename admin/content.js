@@ -1,8 +1,13 @@
-import * as gh from "./github.js";
+import { initAdminGate, isDemo } from "./common.js";
+
+let fb = null;
+if (!isDemo) {
+  try { fb = await import("../js/firebase.js"); } catch (err) { console.warn("Firebase를 불러오지 못했습니다.", err); }
+}
 
 /*
  * 콘텐츠 관리: 장비, 공지사항, 회사 정보, 배너
- * 내용은 data/content.json 하나에 들어 있고, "GitHub에 저장"을 누르면 저장소에 기록됩니다.
+ * 내용은 Firebase의 site/content 문서 하나에 저장됩니다. 한 번도 저장하지 않았으면 data/content.json 을 불러옵니다.
  * 저장 전까지는 이 화면에서만 바뀝니다.
  */
 const CATEGORIES = { generator: "발전기", pump: "엔진양수기", motor: "수중모터", etc: "기타 장비" };
@@ -26,7 +31,6 @@ const saveBtn = document.getElementById("save-btn");
 
 let data = null;      // 지금 화면의 내용
 let original = "";    // 마지막으로 불러오거나 저장한 내용 (변경 확인용)
-let sha = null;       // GitHub 파일 버전
 let tab = "products";
 let editing = null;   // { kind, index } 편집 중인 항목 (-1은 새 항목)
 
@@ -103,38 +107,17 @@ function move(list, i, d) {
   markDirty(); render();
 }
 
-// 사진 올리기 입력: 주소 칸 + 파일 선택 + 미리보기
+// 사진 주소 입력 + 미리보기
 function photoField(value, onChange) {
   const wrap = el("div", "field full photo-field");
-  const text = input("text", value, "images/uploads/... 또는 https://... (비우면 그림 사용)");
-  const lab = el("label", "", "사진");
+  const text = input("text", value, "https://... 사진 주소 (비우면 그림 사용)");
+  const lab = el("label", "", "사진 주소");
   lab.htmlFor = text.id;
-  const row = el("div", "photo-row");
-  const file = document.createElement("input");
-  file.type = "file"; file.accept = "image/*"; file.id = "f" + ++uid;
-  const fileLab = el("label", "btn-small photo-btn", "사진 올리기");
-  fileLab.htmlFor = file.id;
   const preview = el("img", "photo-preview");
   preview.alt = "";
-  const status = el("span", "hint");
   const show = () => { preview.src = imgSrc(text.value.trim()); preview.hidden = !text.value.trim(); };
   text.addEventListener("input", () => { onChange(text.value.trim()); show(); });
-  file.addEventListener("change", async () => {
-    if (!file.files[0]) return;
-    if (!gh.hasToken()) { status.textContent = "사진을 올리려면 먼저 GitHub에 연결해 주세요."; return; }
-    status.textContent = "올리는 중…";
-    try {
-      const path = await gh.uploadImage(file.files[0]);
-      text.value = path; onChange(path); show();
-      status.textContent = "올렸습니다. 'GitHub에 저장'을 눌러야 사이트에 반영됩니다.";
-    } catch (err) {
-      console.error(err);
-      status.textContent = "사진을 올리지 못했습니다. (" + (err.detail || err.message) + ")";
-    }
-    file.value = "";
-  });
-  row.append(text, fileLab, file);
-  wrap.append(lab, row, status, preview);
+  wrap.append(lab, text, el("p", "hint", "인터넷에 올라간 사진의 주소를 붙여 넣습니다. 사진 파일을 바로 올리는 기능은 나중에 추가할 수 있습니다."), preview);
   show();
   return wrap;
 }
@@ -217,7 +200,7 @@ function renderProductForm() {
     };
     if (isNew) data.products.push(item); else data.products[editing.index] = item;
     editing = null; markDirty(); render();
-    message((isNew ? "장비를 추가했습니다." : "장비를 고쳤습니다.") + " 'GitHub에 저장'을 눌러야 사이트에 반영됩니다.", "ok");
+    message((isNew ? "장비를 추가했습니다." : "장비를 고쳤습니다.") + " '저장'을 눌러야 사이트에 반영됩니다.", "ok");
   });
   panel.appendChild(form);
   f.name.focus();
@@ -268,7 +251,7 @@ function renderNoticeForm() {
     if (isNew) data.notices.push(item); else data.notices[editing.index] = item;
     data.notices.sort((a, b) => b.date.localeCompare(a.date));
     editing = null; markDirty(); render();
-    message("공지를 " + (isNew ? "추가" : "수정") + "했습니다. 'GitHub에 저장'을 눌러야 사이트에 반영됩니다.", "ok");
+    message("공지를 " + (isNew ? "추가" : "수정") + "했습니다. '저장'을 눌러야 사이트에 반영됩니다.", "ok");
   });
   panel.appendChild(form);
   title.focus();
@@ -329,19 +312,14 @@ document.querySelectorAll(".inq-tab").forEach((t) => t.addEventListener("click",
 /* ---------- 불러오기 / 저장 ---------- */
 async function load() {
   try {
-    if (gh.hasToken()) {
-      const r = await gh.loadContent();
-      data = r.data; sha = r.sha;
-    } else {
-      const res = await fetch("../data/content.json?v=" + Date.now());
-      data = await res.json(); sha = null;
-    }
+    data = fb ? await fb.fetchContent() : null;
+    if (!data) data = await (await fetch("../data/content.json?v=" + Date.now())).json();
+    delete data.savedAt;
     data.products ||= []; data.notices ||= []; data.banner ||= []; data.company ||= {};
     original = JSON.stringify(data);
   } catch (err) {
     console.error(err);
-    message(err.status === 401 ? "GitHub 토큰이 만료되었거나 잘못되었습니다. 다시 연결해 주세요." : "콘텐츠를 불러오지 못했습니다.", "error");
-    if (err.status === 401) { gh.clearToken(); showConnection(); return load(); }
+    message("콘텐츠를 불러오지 못했습니다. 인터넷 연결과 Firebase 보안 규칙을 확인해 주세요.", "error");
   }
   render();
 }
@@ -359,27 +337,20 @@ function summarize() {
 }
 
 saveBtn.addEventListener("click", async () => {
-  if (!gh.hasToken()) {
-    message("저장하려면 먼저 위에서 GitHub에 연결해 주세요. 고친 내용은 이 화면에 그대로 남아 있습니다.", "error");
-    document.getElementById("gh-card").scrollIntoView({ behavior: "smooth" });
-    return;
-  }
   if (editing) { message("편집 중인 항목을 먼저 '변경 적용'하거나 취소해 주세요.", "error"); return; }
+  if (isDemo || !fb) { message("예시 화면이라 저장되지 않습니다.", "error"); return; }
   saveBtn.disabled = true; saveBtn.textContent = "저장하는 중…";
   try {
     data.updatedAt = new Date().toISOString().slice(0, 10);
-    if (!sha) sha = (await gh.loadContent()).sha;
-    sha = await gh.saveContent(data, sha, summarize());
+    await fb.saveContent(data);
     original = JSON.stringify(data);
     markDirty();
-    message("저장했습니다. 1~2분 뒤 사이트에 반영됩니다.", "ok");
+    message("저장했습니다. 사이트에 바로 반영됩니다. (" + summarize().replace("콘텐츠 수정: ", "") + ")", "ok");
   } catch (err) {
     console.error(err);
-    if (err.status === 409 || err.status === 422) message("그사이 다른 곳에서 내용이 바뀌었습니다. 지금 화면의 변경 내용을 따로 적어 두고, 페이지를 새로고침한 뒤 다시 고쳐 주세요.", "error");
-    else if (err.status === 401 || err.status === 403) message("저장 권한이 없습니다. 토큰의 Contents 권한이 'Read and write'인지 확인해 주세요.", "error");
-    else message("저장하지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요.", "error");
+    message(err.code === "permission-denied" ? "저장 권한이 없습니다. 이 계정이 관리자로 등록되어 있는지 확인해 주세요." : "저장하지 못했습니다. 인터넷 연결을 확인하고 다시 눌러 주세요.", "error");
   } finally {
-    saveBtn.disabled = false; saveBtn.textContent = "GitHub에 저장";
+    saveBtn.disabled = false; saveBtn.textContent = "저장";
   }
 });
 document.getElementById("revert-btn").addEventListener("click", () => {
@@ -387,38 +358,5 @@ document.getElementById("revert-btn").addEventListener("click", () => {
 });
 window.addEventListener("beforeunload", (e) => { if (JSON.stringify(data) !== original) e.preventDefault(); });
 
-/* ---------- GitHub 연결 ---------- */
-function showConnection(login) {
-  document.getElementById("gh-off").hidden = gh.hasToken();
-  document.getElementById("gh-on").hidden = !gh.hasToken();
-  document.getElementById("gh-who").textContent = login ? "(" + login + ")" : "";
-}
-document.getElementById("gh-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const errEl = document.getElementById("gh-error");
-  const t = document.getElementById("gh-token").value.trim();
-  errEl.textContent = "";
-  if (!t) { errEl.textContent = "토큰을 붙여 넣어 주세요."; return; }
-  gh.setToken(t);
-  try {
-    const repo = await gh.checkToken();
-    document.getElementById("gh-token").value = "";
-    showConnection(repo.owner && repo.owner.login);
-    const pending = JSON.stringify(data) !== original ? data : null;
-    await load();
-    if (pending) { data = pending; render(); message("연결했습니다. 고치던 내용은 그대로 있습니다. 'GitHub에 저장'을 눌러 주세요.", "ok"); }
-    else message("연결했습니다.", "ok");
-  } catch (err) {
-    gh.clearToken();
-    errEl.textContent = err.status === 401 ? "토큰이 올바르지 않습니다. 다시 복사해 붙여 넣어 주세요."
-      : err.status === 403 || err.status === 404 ? "이 토큰으로는 shinhwa-webpage 저장소에 쓸 수 없습니다. 저장소 선택과 Contents 'Read and write' 권한을 확인해 주세요."
-      : "연결하지 못했습니다. 인터넷 연결을 확인해 주세요.";
-  }
-});
-document.getElementById("gh-disconnect").addEventListener("click", () => {
-  gh.clearToken(); showConnection(); message("연결을 해제했습니다. 이 기기에서 토큰을 지웠습니다.");
-});
-
-showConnection();
-load();
+initAdminGate(() => load());
 document.documentElement.dataset.ready = "true";

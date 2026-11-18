@@ -9,7 +9,13 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
-    // 제품: 누구나 읽기, 관리자만 쓰기
+    // 사이트 콘텐츠(장비, 공지, 회사 정보, 배너): 누구나 읽기, 관리자만 쓰기
+    match /site/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 제품(이전 방식): 누구나 읽기, 관리자만 쓰기
     match /products/{productId} {
       allow read: if true;
       allow create, update, delete: if isAdmin();

@@ -11,14 +11,20 @@ const firebaseReady = Boolean(fb && fb.isConfigured);
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const params = new URLSearchParams(location.search);
 
-/* ---------- 사이트 콘텐츠 (data/content.json, 관리자 페이지에서 수정) ---------- */
-// GitHub Pages가 파일을 몇 분간 캐시하므로 1분 단위로 주소를 바꿔 최신 파일을 받습니다.
+/* ---------- 사이트 콘텐츠 ---------- */
+// 1순위: Firebase(site/content, 관리자 페이지에서 저장) → 2순위: data/content.json → 3순위: js/products.js
 let content = null;
-try {
-  const res = await fetch("data/content.json?v=" + Math.floor(Date.now() / 60000));
-  if (res.ok) content = await res.json();
-} catch (err) {
-  console.warn("콘텐츠 파일을 불러오지 못했습니다. 기본 데이터로 표시합니다.", err);
+if (firebaseReady) {
+  try { content = await fb.fetchContent(); }
+  catch (err) { console.warn("Firebase에서 콘텐츠를 불러오지 못했습니다.", err); }
+}
+if (!content) {
+  try {
+    const res = await fetch("data/content.json?v=" + Math.floor(Date.now() / 60000));
+    if (res.ok) content = await res.json();
+  } catch (err) {
+    console.warn("콘텐츠 파일을 불러오지 못했습니다. 기본 데이터로 표시합니다.", err);
+  }
 }
 const NOTICE_ITEMS = (content && content.notices) || (typeof NOTICES !== "undefined" ? NOTICES : []);
 
@@ -333,7 +339,7 @@ form.addEventListener("submit", async (e) => {
     message: (data.get("message") || "").trim().slice(0, 2000)
   };
 
-  if (!firebaseReady) {
+  function sendByMail() {
     const lines = [
       "회사명 또는 성함: " + payload.name, "연락처: " + payload.phone,
       "필요한 장비: " + (payload.equipment || "미선택"), "임대 기간: " + (payload.period || "미입력"),
@@ -341,8 +347,8 @@ form.addEventListener("submit", async (e) => {
     ];
     window.location.href = "mailto:" + CONTACT_EMAIL + "?subject=" + encodeURIComponent("[견적 요청] " + payload.name) + "&body=" + encodeURIComponent(lines.join("\n"));
     setStatus("메일 작성 창이 열리지 않으면 " + CONTACT_EMAIL + " 로 보내 주세요.", "success");
-    return;
   }
+  if (!firebaseReady) { sendByMail(); return; }
 
   submitBtn.disabled = true;
   try {
@@ -351,7 +357,8 @@ form.addEventListener("submit", async (e) => {
     setStatus("견적 요청을 보냈습니다. 영업일 기준 하루 안에 연락드립니다.", "success");
   } catch (err) {
     console.error(err);
-    setStatus("보내지 못했습니다. 잠시 후 다시 시도하거나 전화로 문의해 주세요.", "error");
+    // 접수 저장에 실패하면 내용이 사라지지 않도록 메일 작성 창으로 넘깁니다.
+    sendByMail();
   } finally {
     submitBtn.disabled = false;
   }

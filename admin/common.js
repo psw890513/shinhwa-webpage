@@ -41,7 +41,7 @@ export function initAdminGate(onReady) {
     if (logoutBtn) logoutBtn.hidden = true;
     const banner = document.createElement("div");
     banner.className = "notice notice-warn demo-banner";
-    banner.textContent = "예시 화면입니다. 표시된 문의는 가짜 데이터이고, 바꾼 내용은 저장되지 않습니다.";
+    banner.textContent = "예시 화면입니다. 표시된 내용은 예시이고, 바꾼 내용은 저장되지 않습니다.";
     appView.prepend(banner);
     onReady({ email: "demo@example.com" });
     return;
