@@ -3,7 +3,8 @@
 ## 프로젝트 개요
 (주)신화건설기계의 산업기계(발전기, 양수기 등) 임대 웹사이트.
 - 공개 사이트: `index.html`, `about.html`, `contact.html`, `notice.html`, `location.html` (정적 HTML/CSS/JS)
-- 관리자: `admin/index.html` 콘텐츠 관리(장비·공지·회사 정보·배너 → GitHub API로 `data/content.json` 저장, 토큰 로그인), `admin/inquiries.html` 견적 요청 관리(Firebase 필요, 연결 전에는 `?demo`)
+- 관리자: Firebase 이메일 로그인. `admin/index.html` 콘텐츠 관리(장비·공지·회사 정보·배너 → Firestore `site/content` 문서), `admin/inquiries.html` 견적 요청 관리(Firestore `inquiries`). 둘 다 `?demo`로 예시 화면.
+- Firebase 프로젝트: `shinhwa-11e7e` (설정값은 `js/firebase-config.js`)
 - 개발 브랜치: `claude/affectionate-heisenberg-faf044` (PR로 `main`에 합침)
 - 배포: GitHub Pages `main` → https://psw890513.github.io/shinhwa-webpage/
 - 테스트: `npm test` (`tests/smoke.test.js`, Playwright)
@@ -19,10 +20,10 @@
 
 ## 개발 규칙
 - 빌드 도구 없이 동작하는 정적 구조를 유지한다.
-- 사이트 콘텐츠(장비, 공지, 회사 정보, 배너)의 기준은 `data/content.json`이다. 사용자가 관리자 페이지에서 고치면 `main`에 바로 커밋된다. `js/products.js`는 이 파일을 못 읽을 때의 기본값과 상수(구분·상태 이름)만 둔다.
-- 작업 전 반드시 `git fetch origin main && git merge origin/main`으로 사용자가 고친 `data/content.json`을 받는다. 오래된 사본으로 덮어쓰지 않는다. 회사 정보·장비·공지 값을 코드에 직접 넣지 말고 `data/content.json`을 고친다.
-- Firebase는 나중에 연결한다(사용자 결정). 지금은 견적 요청 접수·관리에만 쓴다.
-- Firebase 설정값(`js/firebase-config.js`)은 placeholder 상태일 수 있다. 설정 전에도 공개 사이트가 샘플 데이터로 동작해야 한다.
+- 사이트 콘텐츠(장비, 공지, 회사 정보, 배너)의 기준은 Firestore `site/content` 문서다. 관리자가 한 번도 저장하지 않았거나 Firebase를 못 읽으면 `data/content.json`, 그것도 없으면 `js/products.js`를 쓴다. 콘텐츠 값을 코드에 직접 넣지 않는다(사용자가 관리자 페이지에서 고친다).
+- 작업 전 `git fetch origin main && git merge origin/main`으로 최신 `main`을 받는다.
+- Firebase를 불러오지 못해도 공개 사이트는 `data/content.json`으로 동작해야 하고, 견적 요청 저장에 실패하면 메일 작성으로 넘긴다.
+- 테스트는 `tests/fake-firebase.js`로 gstatic Firebase 모듈을 가짜로 바꿔 실제 코드 흐름(접수, 로그인, 저장)을 확인한다.
 - 보안 규칙은 `firestore.rules`에서 관리한다. 규칙을 바꾸면 README의 배포 안내도 함께 갱신한다.
 - 관리자 페이지는 `noindex` 설정을 유지한다.
 

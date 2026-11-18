@@ -35,7 +35,20 @@ if (isConfigured) {
   auth = getAuth(app);
 }
 
-/* ---------- 제품 ---------- */
+/* ---------- 사이트 콘텐츠 (site/content 문서 하나: 장비, 공지, 회사 정보, 배너) ---------- */
+
+// 아직 한 번도 저장하지 않았으면 null (호출 측이 data/content.json 을 씁니다)
+export async function fetchContent() {
+  if (!isConfigured) return null;
+  const snap = await getDoc(doc(db, "site", "content"));
+  return snap.exists() ? snap.data() : null;
+}
+
+export function saveContent(data) {
+  return setDoc(doc(db, "site", "content"), { ...data, savedAt: serverTimestamp() });
+}
+
+/* ---------- 제품 (이전 방식, 쓰지 않음) ---------- */
 
 // 설정 전이거나 실패하면 null을 반환하여 호출 측이 샘플 데이터를 쓰도록 합니다.
 export async function fetchProducts() {

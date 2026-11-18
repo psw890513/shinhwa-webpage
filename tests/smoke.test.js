@@ -5,6 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const assert = require("node:assert/strict");
 const { chromium } = require("playwright");
+const { useFakeFirebase } = require("./fake-firebase");
 
 const ROOT = path.join(__dirname, "..");
 const TYPES = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg" };
@@ -174,40 +175,69 @@ async function check(name, fn) {
     assert.ok(await page.isVisible("text=본문 내용"));
     await page.close();
   });
-  await check("콘텐츠 관리: 연결 전 편집, GitHub 저장", async () => {
-    const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+  await check("Firebase: 견적 요청 접수 → 관리자 로그인 → 처리", async () => {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await ctx.newPage();
+    page.on("pageerror", (e) => errors.push("Firebase 흐름: " + e.message));
+    await useFakeFirebase(page);
+    // 손님: 견적 요청 보내기
+    await page.goto(base + "/contact.html");
+    await page.waitForSelector("html[data-ready]");
+    await page.fill("#name", "시험건설");
+    await page.fill("#phone", "010-1234-5678");
+    await page.click("#contact-form button[type=submit]");
+    await page.waitForSelector(".form-status.is-success");
+    // 관리자: 틀린 비밀번호 → 오류, 맞는 비밀번호 → 목록
+    await page.goto(base + "/admin/inquiries.html");
+    await page.waitForSelector("#login-view:not([hidden])");
+    await page.fill("#email", "admin@test.com");
+    await page.fill("#password", "wrong");
+    await page.click("#login-form button[type=submit]");
+    await page.waitForSelector("#login-error:not(:empty)");
+    await page.fill("#password", "right-password");
+    await page.click("#login-form button[type=submit]");
+    await page.waitForSelector(".inq-item");
+    assert.match(await page.textContent(".inq-item"), /시험건설/);
+    await page.locator(".inq-item").first().click();
+    await page.click(".inq-status-pick span:text-is('연락함')");
+    await page.click(".inq-form button[type=submit]");
+    await page.waitForSelector(".inq-history li >> text=상태: 연락함");
+    await page.reload();
+    await page.waitForSelector(".inq-item");
+    assert.match(await page.textContent(".inq-item .st"), /연락함/, "새로고침 뒤에도 상태 유지");
+    await ctx.close();
+  });
+  await check("Firebase: 콘텐츠 관리 저장 → 사이트 반영", async () => {
+    const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const page = await ctx.newPage();
     page.on("pageerror", (e) => errors.push("콘텐츠 관리: " + e.message));
-    const raw = fs.readFileSync(path.join(ROOT, "data/content.json"));
-    let saved = null;
-    await page.route("https://api.github.com/**", async (r) => {
-      const req = r.request(); const u = req.url();
-      if (req.method() === "PUT") { saved = JSON.parse(req.postData()); return r.fulfill({ json: { content: { sha: "sha2" } } }); }
-      if (u.includes("/contents/")) return r.fulfill({ json: { sha: "sha1", content: raw.toString("base64") } });
-      return r.fulfill({ json: { permissions: { push: true }, owner: { login: "tester" } } });
-    });
+    await useFakeFirebase(page);
     await page.goto(base + "/admin/index.html");
+    await page.waitForSelector("#login-view:not([hidden])");
+    await page.fill("#email", "admin@test.com");
+    await page.fill("#password", "right-password");
+    await page.click("#login-form button[type=submit]");
     await page.waitForSelector("#panel tbody tr");
-    assert.equal(await page.locator("#panel tbody tr").count(), JSON.parse(raw).products.length);
-    // 연결 전: 장비 추가 후 저장 시 안내
     await page.click("text=+ 장비 추가");
     await page.fill("#panel form input >> nth=0", "시험 발전기 20kVA");
     await page.click("text=목록에 추가");
-    assert.ok(await page.isVisible("#save-bar"));
-    await page.click("#save-btn");
-    assert.match(await page.textContent("#admin-notice"), /GitHub에 연결/);
-    // 연결 후 저장
-    await page.fill("#gh-token", "github_pat_test");
-    await page.click("#gh-form button");
-    await page.waitForSelector("#gh-on:not([hidden])");
     await page.click(".inq-tab[data-tab=company]");
     await page.fill("#panel input >> nth=0", "031-999-0000");
+    assert.ok(await page.isVisible("#save-bar"));
     await page.click("#save-btn");
     await page.waitForSelector(".notice-ok");
-    const json = JSON.parse(Buffer.from(saved.content, "base64").toString("utf8"));
-    assert.equal(saved.sha, "sha1");
-    assert.equal(json.company.phone, "031-999-0000");
-    assert.ok(json.products.some((p) => p.name === "시험 발전기 20kVA"), "연결 전에 추가한 장비도 저장");
     assert.equal(await page.isVisible("#save-bar"), false);
+    await page.goto(base + "/index.html");
+    await page.waitForSelector("html[data-ready]");
+    assert.equal(await page.textContent(".header-phone"), "031-999-0000");
+    assert.ok(await page.isVisible(".card-title:text-is('시험 발전기 20kVA')"));
+    await ctx.close();
+  });
+  await check("콘텐츠 관리 예시 화면(?demo)", async () => {
+    const page = await browser.newPage();
+    await page.goto(base + "/admin/index.html?demo");
+    await page.waitForSelector("#panel tbody tr");
+    assert.equal(await page.isVisible("#login-view"), false);
     await page.close();
   });
   await check("스크립트 오류 없음", async () => {
