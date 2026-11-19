@@ -1,0 +1,377 @@
+<title>신화건설기계 웹사이트 제작기</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+/* 레이아웃: 화면 한 장 = 슬라이드 한 장(세로 스크롤 스냅). 왼쪽 위 단계 표시, 오른쪽 아래 쪽수. 휴대폰에서는 길이만큼 늘어남 */
+:root {
+  --bg: #fbfbfa; --panel: #ffffff; --line: #e4e2dd; --fg: #1b1d22; --muted: #646872;
+  --accent: #d4581a; --accent-soft: #fbeee6; --navy: #1a2234; --quote: #f3f2ef;
+  --display: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15171c; --panel: #1d2027; --line: #2f333d; --fg: #eceef1; --muted: #a1a7b3;
+  --accent: #f07b3c; --accent-soft: #3a2418; --navy: #0f1420; --quote: #23262e; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15171c; --panel: #1d2027; --line: #2f333d; --fg: #eceef1; --muted: #a1a7b3;
+  --accent: #f07b3c; --accent-soft: #3a2418; --navy: #0f1420; --quote: #23262e; color-scheme: dark }
+
+html { height: 100%; }
+body { height: 100%; background: var(--bg); color: var(--fg); font: 17px/1.65 var(--display); word-break: keep-all; }
+.deck { height: 100%; overflow-y: auto; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+.slide { min-height: 100%; scroll-snap-align: start; display: flex; flex-direction: column; justify-content: center;
+  padding-block: 56px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px));
+  border-bottom: 1px solid var(--line); position: relative; }
+.inner { width: 100%; max-width: 1040px; margin: 0 auto; display: grid; gap: 22px; }
+.step { font: 600 13px var(--mono); letter-spacing: .08em; color: var(--accent); text-transform: uppercase; }
+h1, h2, h3 { margin: 0; line-height: 1.3; letter-spacing: -.02em; text-wrap: balance; }
+h1 { font-size: clamp(34px, 5.4vw, 60px); font-weight: 700; }
+h2 { font-size: clamp(26px, 3.6vw, 40px); font-weight: 700; }
+h3 { font-size: 18px; font-weight: 700; }
+p { margin: 0; }
+.lead { font-size: clamp(18px, 2vw, 22px); color: var(--muted); max-width: 46em; }
+.muted { color: var(--muted); }
+a { color: var(--accent); }
+code { font: 500 .9em var(--mono); background: var(--quote); padding: 1px 6px; border-radius: 4px; }
+
+/* 사용자 프롬프트 인용 */
+.prompt { margin: 0; padding: 14px 18px; background: var(--quote); border-radius: 12px; font-size: 16px; }
+.prompt::before { content: "사용자"; display: block; margin-bottom: 4px; font: 600 12px var(--mono); letter-spacing: .06em; color: var(--muted); }
+.prompt.claude { background: var(--accent-soft); }
+.prompt.claude::before { content: "Claude"; color: var(--accent); }
+
+.cols { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.box { padding: 18px 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.box ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+
+/* 숫자 */
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--panel); }
+.stats div { padding: 22px 24px; border-left: 1px solid var(--line); border-top: 1px solid var(--line); margin: -1px 0 0 -1px; }
+.stats b { display: block; font: 600 clamp(30px, 4vw, 44px)/1.1 var(--mono); font-variant-numeric: tabular-nums; }
+.stats span { color: var(--muted); font-size: 15px; }
+
+/* 타임라인 */
+.timeline { display: grid; gap: 0; border-left: 2px solid var(--line); margin-left: 6px; }
+.timeline li { list-style: none; position: relative; padding: 0 0 18px 24px; }
+.timeline li::before { content: ""; position: absolute; left: -7px; top: 8px; width: 12px; height: 12px; border-radius: 50%; background: var(--panel); border: 2px solid var(--accent); }
+.timeline time { font: 600 13px var(--mono); color: var(--muted); }
+.timeline ol, .timeline { padding: 0; margin-top: 0; margin-bottom: 0; }
+
+/* 디자인 변천 */
+.versions { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; counter-reset: v; }
+.versions li { list-style: none; padding: 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); display: grid; gap: 6px; align-content: start; font-size: 15px; }
+.versions li.final { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.versions b { font-size: 16px; }
+.tag { display: inline-block; justify-self: start; padding: 1px 9px; border-radius: 999px; font: 600 12px var(--mono); background: var(--quote); color: var(--muted); }
+.final .tag { background: var(--accent); color: #fff; }
+
+/* 구조도 */
+.flow { display: grid; grid-template-columns: 1fr auto 1.3fr auto 1fr; align-items: center; gap: 12px; }
+.node { padding: 16px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); text-align: center; display: grid; gap: 4px; }
+.node small { color: var(--muted); font-size: 13px; }
+.node.hub { border-color: var(--accent); }
+.arrow { font: 600 22px var(--mono); color: var(--muted); }
+
+.lesson { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; align-items: baseline; }
+.lesson dt { font: 600 13px var(--mono); color: var(--accent); }
+.lesson dd { margin: 0; }
+
+.cover { background: var(--navy); color: #fff; }
+.cover .lead { color: #c3c9d6; }
+.cover .step { color: #f39a63; }
+.cover a { color: #f39a63; }
+
+.pager { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); display: flex; gap: 6px; align-items: center; z-index: 5; }
+.pager button { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: 600 16px var(--mono); cursor: pointer; }
+.pager button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pager span { min-width: 56px; text-align: center; font: 600 13px var(--mono); color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 860px) {
+  .cols, .cols3 { grid-template-columns: 1fr; }
+  .versions { grid-template-columns: 1fr 1fr; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flow { grid-template-columns: 1fr; }
+  .arrow { transform: rotate(90deg); justify-self: center; }
+}
+@media (max-width: 600px) {
+  body { font-size: 16px; }
+  .deck { scroll-snap-type: none; }
+  .slide { min-height: auto; padding-block: 44px; }
+  .versions { grid-template-columns: 1fr; }
+  .pager span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .deck { scroll-behavior: auto; } }
+</style>
+
+<main class="deck" id="deck">
+
+<section class="slide cover">
+  <div class="inner">
+    <p class="step">발표 자료 · 2026.11.12 – 11.19</p>
+    <h1>(주)신화건설기계<br>장비 임대 웹사이트 제작기</h1>
+    <p class="lead">대화만으로 기획, 디자인, 개발, 배포, 관리자 기능까지 진행한 과정을 프롬프트 흐름 순서대로 정리했습니다.</p>
+    <p>사이트: <a href="https://psw890513.github.io/shinhwa-webpage/" target="_blank" rel="noopener">psw890513.github.io/shinhwa-webpage</a></p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">한눈에 보기</p>
+    <h2>8일, 대화로 만든 결과</h2>
+    <div class="stats">
+      <div><b>8일</b><span>11월 12일 첫 요청부터</span></div>
+      <div><b>12건</b><span>main에 합친 변경 묶음(PR)</span></div>
+      <div><b>5번</b><span>디자인을 다시 잡은 횟수</span></div>
+      <div><b>5+2</b><span>공개 페이지 5개, 관리자 페이지 2개</span></div>
+      <div><b>24개</b><span>매번 돌리는 자동 점검 테스트</span></div>
+      <div><b>0원</b><span>호스팅과 데이터베이스 비용 (무료 범위)</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">흐름</p>
+    <h2>일곱 단계로 진행했습니다</h2>
+    <ol class="timeline">
+      <li><time>11.12</time><h3>1. 첫 요청과 뼈대</h3><p class="muted">임대 회사 사이트, 회사명, 관리자 페이지, Firebase 선택</p></li>
+      <li><time>11.12</time><h3>2. 일하는 규칙 정하기</h3><p class="muted">링크 항상 주기, 미리보기는 맨 끝, 규칙은 CLAUDE.md에 저장</p></li>
+      <li><time>11.12 – 11.13</time><h3>3. 디자인 다섯 번 다시 잡기</h3><p class="muted">"AI 같지 않게" → 참고 사이트 → Figma → 임대몰 구성</p></li>
+      <li><time>11.13</time><h3>4. 배포</h3><p class="muted">GitHub main 합치기, GitHub Pages 무료 호스팅</p></li>
+      <li><time>11.13</time><h3>5. 작업 체계 만들기</h3><p class="muted">스킬 설치, 네 칸 점검, 자동 테스트, 기능 점검표</p></li>
+      <li><time>11.13</time><h3>6. 구조 고치기</h3><p class="muted">메뉴 클릭 시 스크롤 → 메뉴별 페이지로 분리</p></li>
+      <li><time>11.13 – 11.19</time><h3>7. 관리자 기능</h3><p class="muted">견적 요청 관리 → 콘텐츠 관리 → Firebase 로그인 연결</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">1단계 · 첫 요청과 뼈대</p>
+    <h2>한 문단짜리 요청에서 시작</h2>
+    <blockquote class="prompt">하이 웹페이지를 하나 만들건데 발전기, 양수기 등 산업용 기계들을 임대하는 회사의 웹사이트야. 결제 모듈까지는 필요 없고 회사 소개 / 제품 카탈로그 / 연락 정도로 구성하고 싶어</blockquote>
+    <div class="cols">
+      <div class="box"><h3>바로 만든 것</h3><ul><li>빌드 도구 없는 정적 사이트 (HTML, CSS, JS)</li><li>회사 소개, 장비 카탈로그, 문의 폼</li></ul></div>
+      <div class="box"><h3>이어서 붙은 요구</h3><ul><li>회사명: 신화 건설 → (주)신화건설기계</li><li>"제품 등록하는 관리자 페이지랑 접수 내역 확인 페이지도 필요"</li><li>"Firebase로 해줘" → 데이터 저장 방식 결정</li></ul></div>
+    </div>
+    <p class="muted">포인트: 처음부터 다 정하지 않아도 됩니다. 만들어진 것을 보고 다음 요구가 자연스럽게 나왔습니다.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">2단계 · 일하는 규칙</p>
+    <h2>반복되는 요청은 규칙 파일로</h2>
+    <div class="cols">
+      <div class="box">
+        <blockquote class="prompt">내가 한 질문에 답변한 뒤 확인할 수 있는 링크를 항상 알려줘. 스킬에 정의할 거야, 프로젝트 지침에 저장할 거야?</blockquote>
+        <blockquote class="prompt">미리보기 아티팩트는 너가 말하는 가장 마지막에 넣도록 해. 그래야 내가 바로 확인하지</blockquote>
+        <blockquote class="prompt">스킬에 항상 한국어 답변 추가</blockquote>
+      </div>
+      <div class="box">
+        <h3>CLAUDE.md (프로젝트 지침)에 저장한 것</h3>
+        <ul>
+          <li>답변 뒤에는 확인 링크를 항상, 이전/최신 버전 표시</li>
+          <li>미리보기 링크는 답변의 마지막 줄</li>
+          <li>모든 답변은 한국어</li>
+          <li>사용량이 늘면 무거운 스킬을 빼자고 먼저 제안</li>
+          <li>작업 순서: 점검 → 계획 → 테스트 → 구현 → 검증 → 합치기</li>
+        </ul>
+        <p class="muted">이 파일은 새 대화를 열어도 매번 다시 읽힙니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">3단계 · 디자인</p>
+    <h2>디자인은 다섯 번 다시 잡았습니다</h2>
+    <ol class="versions">
+      <li><span class="tag">1</span><b>첫 시안</b><span class="muted">기본 구성. "너무 AI가 만든 것 같다"</span></li>
+      <li><span class="tag">2</span><b>흰 배경, 사양표</b><span class="muted">"배경은 화이트로, AI가 만든 것 같지 않게"</span></li>
+      <li><span class="tag">3</span><b>평택발전기.com 구성</b><span class="muted">사이트 접속이 막혀 사용자가 화면 캡처를 보내 줌</span></li>
+      <li><span class="tag">4</span><b>Figma + 디자인 스킬</b><span class="muted">frontend-design, ui-ux-pro-max 설치 후 Figma에서 시안 → 코드 반영</span></li>
+      <li class="final"><span class="tag">최종</span><b>sycmc.com 임대몰 구성</b><span class="muted">"피그마를 굳이 쓸 필요 없다면 안 써도 됨"</span></li>
+    </ol>
+    <div class="cols">
+      <div class="box"><h3>잘 된 것</h3><p>참고 사이트 주소 하나가 "AI 같지 않게" 같은 추상적인 말보다 훨씬 빨리 원하는 결과로 이어졌습니다.</p></div>
+      <div class="box"><h3>지킨 원칙</h3><p>참고 사이트의 사진, 로고, 문구는 쓰지 않고 구성만 참고. 장비 그림은 직접 그린 SVG, 가격은 지어내지 않고 "견적 문의".</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">막혔던 순간</p>
+    <h2>문제가 생겼을 때 이렇게 풀었습니다</h2>
+    <div class="cols">
+      <div class="box"><h3>참고 사이트 접속 차단</h3><p class="muted">작업 환경의 네트워크 정책으로 평택발전기.com이 막힘 → 사용자가 화면을 캡처해서 전달</p></div>
+      <div class="box"><h3>장비 사진</h3><p class="muted">"인터넷에서 제품 사진 찾아 넣어봐" → 검색이 느리고 저작권 문제 → 직접 그린 장비 그림으로 대체, 실제 사진은 관리자에서 넣도록</p></div>
+      <div class="box"><h3>사용량</h3><blockquote class="prompt">아니 ㅇ 하나 썼는데 세션을 뭔 9프로나 사용하는데</blockquote><p class="muted">긴 대화는 매번 전체를 다시 읽음 → 대화 압축(/compact), 요청 모아서 보내기</p></div>
+      <div class="box"><h3>외부 설치 스크립트 차단</h3><p class="muted">스킬 설치 스크립트 실행이 보안 정책에 막힘 → 같은 파일을 직접 복사해서 설치</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">4단계 · 배포</p>
+    <h2>"왜 깃허브에 아무것도 없지?"에서 배포까지</h2>
+    <div class="cols">
+      <div class="box">
+        <blockquote class="prompt">왜 깃허브 소스에 아무것도 없지?</blockquote>
+        <blockquote class="prompt claude">작업은 별도 브랜치에 있고, 기본 화면인 main에는 README만 있었습니다.</blockquote>
+        <blockquote class="prompt">main에 합쳐줘</blockquote>
+      </div>
+      <div class="box">
+        <blockquote class="prompt">무료 호스팅으로 배포해줘. 도메인 나중에 할거야</blockquote>
+        <ul>
+          <li>저장소가 비공개라 GitHub Pages를 쓸 수 없음 → 사용자가 공개로 전환하기로 선택</li>
+          <li>설정은 저장소 주인만 가능 → 클릭 순서를 안내, 사용자가 직접 설정</li>
+          <li>이후 main에 합칠 때마다 1~2분 뒤 자동 배포</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">5단계 · 작업 체계</p>
+    <h2>스킬로 작업 방식 자체를 정리</h2>
+    <div class="cols3">
+      <div class="box"><h3>dev-check</h3><p class="muted">사용자가 제안한 네 칸 틀(Known/Unknown)을 점검 스킬로 직접 만듦. 정해야 할 것과 현장에 물어볼 것을 구분</p></div>
+      <div class="box"><h3>superpowers</h3><p class="muted">계획, 테스트 먼저, 디버깅, 완료 전 검증 같은 개발 습관 묶음. 사용량이 늘 수 있어 "많아지면 빼자고 알려줘" 규칙 추가</p></div>
+      <div class="box"><h3>im-not-ai</h3><p class="muted">한글 문구의 AI 티 점검. 사이트 문구를 검사해 회사소개 한 문장만 다듬음</p></div>
+    </div>
+    <div class="cols">
+      <div class="box"><h3>자동 점검 테스트 (npm test)</h3><p class="muted">PC·모바일 화면, 메뉴 이동, 검색, 견적 폼, 관리자 화면, 로그인과 저장 흐름까지 24개. 바꿀 때마다 실행</p></div>
+      <div class="box"><h3>기능 점검표</h3><p class="muted">"기능 리스트와 작동 여부, 주의할 점을 아티팩트로 관리해줘" → 기능마다 상태와 주의점을 적고, 바뀔 때마다 갱신</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">6단계 · 구조 고치기</p>
+    <h2>사용자가 직접 써 보고 찾은 문제</h2>
+    <blockquote class="prompt">사이트 점검 좀 하자. 왜 메뉴를 클릭하는데 아래로 스크롤이 되는 거지?</blockquote>
+    <div class="cols">
+      <div class="box"><h3>원인</h3><p class="muted">모든 내용이 한 페이지에 있고, 메뉴는 그 안의 위치로 스크롤하는 방식이었습니다. 회사소개는 메뉴 맨 앞인데 내용은 맨 아래에 있었습니다.</p></div>
+      <div class="box"><h3>결정과 결과</h3><p class="muted">"메뉴별 페이지 분리"를 선택 → 임대/렌탈, 회사소개, 견적문의, 공지사항, 오시는 길 5개 페이지. 장비 카드의 견적 요청은 장비를 미리 채운 채 이동합니다.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">7단계 · 관리자 기능</p>
+    <h2>방식을 세 번 바꿔 사용자에게 맞췄습니다</h2>
+    <ol class="timeline">
+      <li><time>①</time><h3>견적 요청 관리</h3><p class="muted">"견적 요청을 받아서 처리 가능한 관리자 페이지" → 신규 → 연락함 → 견적 발송 → 계약 → 완료, 처리 메모와 기록, 24시간 지연 경고</p></li>
+      <li><time>②</time><h3>Firebase 없이 콘텐츠 관리</h3><p class="muted">"일단은 Firebase 로그인 없이 콘텐츠 관리하는 것만 하자" → 장비, 공지, 회사 정보, 배너를 GitHub 토큰으로 저장</p></li>
+      <li><time>③</time><h3>Firebase 연결</h3><blockquote class="prompt">토큰 뭔지 모르겠다. Firebase 연동하자</blockquote><p class="muted">→ 이메일과 비밀번호 로그인, 콘텐츠와 견적 요청을 Firebase에 저장. 설정값은 사용자가 콘솔에서 복사해 전달</p></li>
+    </ol>
+    <p class="muted">포인트: 기술적으로 맞는 방식보다 쓰는 사람이 이해할 수 있는 방식이 남았습니다.</p>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">지금의 구조</p>
+    <h2>서버 없이 무료로 돌아갑니다</h2>
+    <div class="flow">
+      <div class="node"><b>손님</b><small>휴대폰·PC</small></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node hub"><b>GitHub Pages</b><small>사이트 5개 페이지 + 관리자 2개</small><small>main에 합치면 자동 배포</small></div>
+      <span class="arrow" aria-hidden="true">↔</span>
+      <div class="node"><b>Firebase</b><small>콘텐츠(site/content)</small><small>견적 요청(inquiries)</small><small>관리자 로그인</small></div>
+    </div>
+    <div class="cols">
+      <div class="box"><h3>사용자가 관리자 페이지에서 하는 일</h3><ul><li>장비, 공지, 회사 정보, 배너 수정 → 바로 반영</li><li>견적 요청 확인과 처리 기록</li></ul></div>
+      <div class="box"><h3>지켜 둔 안전장치</h3><ul><li>Firebase를 못 읽으면 기본 콘텐츠 파일로 표시</li><li>견적 저장에 실패하면 메일 작성으로 넘김</li><li>관리자는 손님이 쓴 요청 내용을 고칠 수 없음</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">돌아보기</p>
+    <h2>프롬프트에서 배운 것</h2>
+    <div class="cols">
+      <div class="box">
+        <h3>잘 통한 요청</h3>
+        <dl class="lesson">
+          <dt>참고</dt><dd>추상적인 말보다 참고 사이트 주소 하나</dd>
+          <dt>규칙</dt><dd>반복되는 요구는 "지침에 저장해줘"로 한 번에</dd>
+          <dt>점검</dt><dd>직접 써 보고 "왜 이렇지?"라고 묻기</dd>
+          <dt>결정</dt><dd>선택지를 받으면 바로 고르기 (공개 전환, 페이지 분리)</dd>
+          <dt>관리</dt><dd>상태를 아티팩트로 남겨 두고 계속 갱신</dd>
+        </dl>
+      </div>
+      <div class="box">
+        <h3>아쉬웠던 점</h3>
+        <dl class="lesson">
+          <dt>사용량</dt><dd>짧은 메시지도 긴 대화 전체를 다시 읽음 → 모아서 요청</dd>
+          <dt>용어</dt><dd>토큰, UID 같은 말은 왜 필요한지부터 설명했어야 함</dd>
+          <dt>언어</dt><dd>규칙을 정한 뒤에도 영어 답변이 두 번 나옴</dd>
+          <dt>왕복</dt><dd>Figma와 사진 검색은 시간을 썼지만 최종에 남지 않음</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="inner">
+    <p class="step">다음 할 일</p>
+    <h2>실제 운영까지 남은 것</h2>
+    <div class="cols">
+      <div class="box">
+        <h3>사용자가 Firebase 콘솔에서</h3>
+        <ul><li>관리자 계정 만들고 UID를 admins에 등록</li><li>보안 규칙 붙여 넣고 게시</li><li>승인된 도메인에 사이트 주소 추가</li></ul>
+      </div>
+      <div class="box">
+        <h3>그다음</h3>
+        <ul><li>실제 회사 정보, 장비, 공지 입력 (관리자 페이지)</li><li>도메인 연결과 검색엔진 등록</li><li>새 견적 요청 알림 (문자·메일)</li></ul>
+      </div>
+    </div>
+    <p>사이트 <a href="https://psw890513.github.io/shinhwa-webpage/" target="_blank" rel="noopener">psw890513.github.io/shinhwa-webpage</a> · 소스 <a href="https://github.com/psw890513/shinhwa-webpage" target="_blank" rel="noopener">github.com/psw890513/shinhwa-webpage</a></p>
+  </div>
+</section>
+
+</main>
+
+<nav class="pager" aria-label="슬라이드 이동">
+  <button type="button" id="prev" aria-label="이전 슬라이드">↑</button>
+  <span id="count">1 / 1</span>
+  <button type="button" id="next" aria-label="다음 슬라이드">↓</button>
+</nav>
+
+<script>
+const deck = document.getElementById("deck");
+const slides = [...document.querySelectorAll(".slide")];
+const count = document.getElementById("count");
+let current = 0;
+function update() {
+  const mid = deck.scrollTop + deck.clientHeight / 3;
+  current = slides.reduce((acc, s, i) => (s.offsetTop <= mid ? i : acc), 0);
+  count.textContent = (current + 1) + " / " + slides.length;
+}
+function go(i) {
+  current = Math.max(0, Math.min(slides.length - 1, i));
+  slides[current].scrollIntoView({ block: "start" });
+}
+deck.addEventListener("scroll", update, { passive: true });
+document.getElementById("prev").addEventListener("click", () => go(current - 1));
+document.getElementById("next").addEventListener("click", () => go(current + 1));
+document.addEventListener("keydown", (e) => {
+  if (["ArrowDown", "PageDown", "ArrowRight", " "].includes(e.key)) { e.preventDefault(); go(current + 1); }
+  if (["ArrowUp", "PageUp", "ArrowLeft"].includes(e.key)) { e.preventDefault(); go(current - 1); }
+  if (e.key === "Home") go(0);
+  if (e.key === "End") go(slides.length - 1);
+});
+update();
+</script>
